@@ -25,6 +25,7 @@ if "Simulacions_guardades" not in st.session_state:
 if "boto_1" not in st.session_state: #és ST. session"_"state
  st.session_state.boto_1=False
 
+st.write("Hola hola ")
 # Comptador de simulacions guardades a l'esquerra
 with st.sidebar:
 #https://docs.streamlit.io/develop/api-reference/layout/st.sidebar

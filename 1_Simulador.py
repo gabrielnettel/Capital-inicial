@@ -113,12 +113,13 @@ with dades_inversió:
         #https://www.youtube.com/watch?v=oBiuR_Z2ac4&t=11s
            
         # Demano que es trii l'estratègia 
-        estrat= st.selectbox(
+        estratègia= st.selectbox(
             label= "Tria l'estratègia",
             options= ["Buy&Hold","Dollar Cost Averaging(DCA)","Stop-Loss i Take-Profit","Diversificació"],
             # https://www.w3schools.com/python/python_lists.asp
-            # Cada cop que es canvii l'estratègia anira a la funció de def canvi_estratègia
-            on_change= canvi_estratègia# No hi va el parèntesis
+
+            # S'emprà la funció de on_change per així cada cop que es canviï l'estratègia s'executi aquesta funció
+            on_change= canvi_estratègia # Anotació: No hi ha cap parèntesis
             )
         #https://docs.streamlit.io/develop/api-reference/widgets/st.selectbox
 
@@ -131,7 +132,7 @@ with dades_inversió:
              st.session_state.boto_1=False
         # OK
         # Aqui dic que si la estrategia no es igual a Diversificació, és a dir a totes les restants, que entri en aquest if, que es triar l'empresa individual i el sector, es així perquè a Diversificació es realitza amb més d'una empresa
-        if estrat != "Diversificació": 
+        if estratègia != "Diversificació": 
         # https://www.geeksforgeeks.org/python/python-not-equal-operator/
 
             # Demano que es trii el sector en que es vulgui invertir
@@ -209,7 +210,7 @@ with dades_inversió:
 
 
         # Aqui torno a dir que si la estrategia no es igual a Diversificació, és a dir a totes les restants, que entri en aquest if. Perquè diversificaicó funciona "diferent"
-        if estrat != "Diversificació":
+        if estratègia != "Diversificació":
                     # Creo una variable que busqui l'empresa triada al dicci_ticker i que aquesta variable guarda el ticker de l'empresa
                     ticker=dicci_tickers[empresa]
                     # https://www.w3schools.com/python/python_dictionaries_access.asp
@@ -309,7 +310,7 @@ with dades_inversió:
                 # OK
 
         # En el cas que l'estratègia sigui la de Dollar Cost Averaging, entro en aquesta condició
-        if estrat== "Dollar Cost Averaging(DCA)":
+        if estratègia== "Dollar Cost Averaging(DCA)":
                             # Creo que una variable que em permet mitjançant la fórmula transformar els anys del períoda a mesos
                             mesos = (data_2.year * 12+ data_2.month)-(data_1.year*12+ data_1.month)
                             # https://es.stackoverflow.com/questions/513244/como-calcular-el-numero-de-meses-entre-dos-fechas
@@ -381,7 +382,7 @@ if st.session_state.simulacio_feta==True:
 
    
     # Poso la condició que si la estratègia triada és buy&hold que entri
-    if estrat == "Buy&Hold":
+    if estratègia == "Buy&Hold":
         # Divideixo el capital inicial entre el preu open del primer dia, d'aquesta manera obtinc el nombre total d'accions que podem comprar
         accions_1= capital / taula["Open"].iloc[0]
 
@@ -597,7 +598,7 @@ if st.session_state.simulacio_feta==True:
 
 
      # Creo la condició que si l'estratègia és Dollar Cost Averaging(DCA) i no Buy&Hold, que s'excecuti el programa
-    elif estrat == "Dollar Cost Averaging(DCA)":
+    elif estratègia == "Dollar Cost Averaging(DCA)":
 
                 # Estableixo una condició on si l'opció de la frequència és la mensual, que s'executo el codi de adins
                 if DCA_opcions =="Mensual":
@@ -1139,7 +1140,7 @@ if st.session_state.simulacio_feta==True:
 
                 
     # Creo la condició que si l'estratègia és Stop-Loss i Take-Profit i no Dollar Cost Averaging(DCA) i Buy&Hold, que s'excecuti el programa
-    elif estrat == "Stop-Loss i Take-Profit":
+    elif estratègia == "Stop-Loss i Take-Profit":
 
         # Divideixo el capital inicial entre el preu open del primer dia, d'aquesta manera obtinc el nombre total d'accions que podem comprar
         accions_comprades= capital/taula["Open"]    .iloc[0]
@@ -1545,7 +1546,7 @@ if st.session_state.simulacio_feta==True:
                 
 
     # En el cas que no sigui ni Buy&Hold, ni DCA ni Stop-Loss i Take-Pofit llavors entra en aquest if
-    elif estrat == "Diversificació":
+    elif estratègia == "Diversificació":
 
         # Divisor
         st.divider()

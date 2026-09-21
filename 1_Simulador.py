@@ -25,11 +25,11 @@ if "Simulacions_guardades" not in st.session_state:
 if "boto_1" not in st.session_state: #és ST. session"_"state
  st.session_state.boto_1=False
 
-st.write("Hola hola ")
+
 # Comptador de simulacions guardades a l'esquerra
 with st.sidebar:
 #https://docs.streamlit.io/develop/api-reference/layout/st.sidebar
-    veces=1
+    veces=16
     for i in range(veces):
     # https://www.geeksforgeeks.org/python/python-range-function/
         st.title(" ")
@@ -247,7 +247,7 @@ with dades_inversió:
                     data_2=st.date_input(
                         label="Tria la data final",
                         value=datetime.date.today(),
-                        min_value=datetime.date(1900,1,1),
+                        min_value=empresa_123.index[0].to_pydatetime().date(),
                         max_value=datetime.date.today()
                     )
                     # Amb aquesta condició dic que la data final no pot ser menor o igual a la data inicial
@@ -261,7 +261,8 @@ with dades_inversió:
                             taula= empresa_triada.history(
                                 # Amb aquest paràmetres aconsegueixo que la taula només em proporcioni la informació de l'empresa de la data inicial fins la data final
                                 start=data_1,
-                                end= data_2
+                                end= data_2 + datetime.timedelta(days=1),
+                                auto_adjust=True
                                 )
                             # https://algotrading101.com/learn/yfinance-guide/
 
@@ -275,7 +276,7 @@ with dades_inversió:
                                     # Amb iloc[0] demano el primer element de la columna "Open", és a dir el preu de la data inicial
                                     open_preu_1 = taula["Open"].iloc[0]  
                                     # # Amb iloc[0] demano l'últim element de la columna "Open", és a dir el preu de la data final
-                                    open_preu_2 = taula["Open"].iloc[-1]
+                                    open_preu_2 = taula["Close"].iloc[-1]
                                     # https://pandas.pydata.org/docs/getting_started/intro_tutorials/03_subset_data.html
                                     # https://medium.com/@icodewithben/understanding-the-iloc-function-in-pandas-da9dec1a1ee1
 
@@ -293,8 +294,8 @@ with dades_inversió:
               # Demano la data final
               data_2div=st.date_input(
                             
-                    label="Tria la data de inici",
-                    value=datetime.date(2026,1,1),
+                    label="Tria la data de final",
+                    value=datetime.date.today(),
                     min_value=datetime.date(1990,1,1),
                     max_value=datetime.date.today()
                     )
@@ -331,7 +332,7 @@ with dades_inversió:
                                     options=["Mensual"]
                                 )
                                 st.write("Si desitjes fer-ho anualment el període de temps ha de ser major a 2 anys")
-                            # OK
+                                st.session_state.simulacio_feta=False                            # OK
 
             
 # Aquest apartat només té ús informatiu, són expandibles que t'informen de què és cada element que es tracta al simulador
@@ -397,7 +398,7 @@ if st.session_state.simulacio_feta==True:
         # https://www.geeksforgeeks.org/pandas/iterating-over-rows-and-columns-in-pandas-dataframe/
 
             # Aqui obteninc cada preu d'obertura d'aquell dia
-             preu_dia=taula.loc[dates_BH_act,"Open"]
+             preu_dia=taula.loc[dates_BH_act,"Close"]
              # https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.loc.html
 
             # Faig el càlcul necessari per calcular el valor d'aquell dia mitjançant la multiplicació el nombre de accions que tinc per el preu d'aquell dia
@@ -451,7 +452,7 @@ if st.session_state.simulacio_feta==True:
         
         # Aqui per causes d'estètica creo diferents columnes amb diferents mides per aconseguir un recuadra remarcat on es detalli tots els detalls de la simulació
         # Les columens 3,4,5 només són espais
-        col_resultats,col3,col4,col5 = st.columns([3,1,1,1])#
+        col_resultats,col3,col4,col5 = st.columns([5,1,1,1])#
         # OK
         
         # A la columna del recuadre dels detalls torno a crear dues columens per posar les dates de diferents mides depenent l'importància
@@ -465,15 +466,15 @@ if st.session_state.simulacio_feta==True:
         with col1: 
                 
                 # Creo un string (f) per aconseguir posar el número que vull del nombre d'accions totals arrodonit a 2 decimals
-                st.write(f"Nombre d'accions comprades: {accions_1:.2f}")
+                st.write(f"Nombre d'accions comprades: {accions_1:,.2f}")
                 # https://www.w3schools.com/PYTHON/python_string_formatting.asp 
 
                 # Creo la variable de rendebilitat mitjançant la fórmula
-                rendibilitat= (taula["Open"].iloc[-1]-taula["Open"].iloc[0])/taula["Open"].iloc[0]*100 
+                rendibilitat= (taula["Close"].iloc[-1]-taula["Open"].iloc[0])/taula["Open"].iloc[0]*100 
                 # PONER FÓRMULA
 
                 # Represento la fórmula de rendibilitat amb dos decimals en percent
-                st.write(f"Rendibilitat:\n{rendibilitat:.2f} % ")
+                st.write(f"Rendibilitat:\n{rendibilitat:,.2f} % ")
 
                 # Per aconseguir fer el drawdown torno a crear una altra taula de pandas de la llista de valors amb pd.Series, i gràcies amb .cummax aconsegueixo registrar obtenir el número més gran amb relació amb el anterior
                 maxims_acumulats=pd.Series(valor_BUY).cummax()# cummax no fiunciona a llistes, ha de ser un pandas 
@@ -488,7 +489,7 @@ if st.session_state.simulacio_feta==True:
                 # https://www.w3schools.com/python/ref_func_min.asp
                 
                 # Represento el resultat del màxim drawdonw
-                st.write(f"Màxim Drawdown: {caiguda_mes_gran:.2f} %")
+                st.write(f"Màxim Drawdown: {caiguda_mes_gran:,.2f} %")
 
                 # Creo una nova taula de pandas de la llista de valor_BUY, després amb .pct_change calculo el canvi que hi ha hagut entre el valors anteriors i els actuals, és a dir el percentatge de diferència que hi ha hagut d'un valor a un altre
                 # Amb .dropna m'ajuda a borrar aquella primera filera ja que com no té un valor anterior em sortiria None
@@ -513,29 +514,19 @@ if st.session_state.simulacio_feta==True:
                 volatilitat = rendiments.std() * (252 ** 0.5) * 100
 
                 # Represento la volatilitat
-                st.write(f"Volatilitat: {volatilitat:.2f} %")
+                st.write(f"Volatilitat: {volatilitat:,.2f} %")
 
                 # Represento el sharpe
-                st.write(f"Sharpe: {sharpe:.2f}")
+                st.write(f"Sharpe: {sharpe:,.2f}")
 
                 # Per al capital màxim agafo el valor més gran del capital de la taula de valors
-                capital_max= max(valor_BUY)
-                # https://www.w3schools.com/PYTHON/ref_func_max.asp
-
-                # Per al capital màxim agafo el valor més gran del capital de la taula de valors
-                capital_min=min(valor_BUY)
-                # OK
-
-                # Represento el capital màxim arribat
-                st.write(f"Capital màxim: { capital_max:.2f} USD")
-                # Represento el capital mínim arribat
-                st.write(f"Capital mínim: {capital_min:.2f} USD")
+                
                 
         # Segona columna            
         with col2:
 
                 # Creo la fórmula per aconseguir tenir el valor final de la simulacio amb b&H multiplicant el nombre d'accions pel preu final d'bertura del últim dia
-                valor_final_BH= accions_1*taula["Open"].iloc[-1]
+                valor_final_BH= accions_1*taula["Close"].iloc[-1]
 
                 # Creo la fórmula per aconseguir el benefici
                 benefici= valor_final_BH-capital 
@@ -543,14 +534,15 @@ if st.session_state.simulacio_feta==True:
                 # Represento el resultat de benefici amb números més grans
                 st.metric(
                     label="Benefici",
-                    value= f"{benefici:.2f} USD") 
+                    value= f"{benefici:,.2f} USD") 
                 
                 # https://docs.streamlit.io/develop/api-reference/data/st.metric
                 # Represento el resultat del valor final de la simulació amb la mateixa mida que el benefici
                 st.metric(
                 label="Valor final",
-                value=f"{valor_final_BH:.2f} USD"
+                value=f"{valor_final_BH:,.2f} USD"
                 )
+              
 
         # Les columnes que actuen d'espais
         with col3:
@@ -583,8 +575,8 @@ if st.session_state.simulacio_feta==True:
 
              # En el cas que no s'activi, és a dir, continui en false, llavors creo un diccionari (dicci_BH) el qual guarda: L'estratègia, l'empresa, el capital inicial, el valor fianl, el benefici, la rendibilitat, el màxim drawdown, la volatilitat, el sharpe, el capital màxim i el capital mínim, l'evolució del capital, és a dir la llista dels valors, la evolució de les dates, és a dir, la llista de totes les dates, la data d'inici i la data final
              else:
-                dicci_BH= {"Estratègia":"Buy&Hold","Empresa":empresa,"Capital inicial":capital,"Valor final":valor_final_BH,"Benefici":benefici,"Rendibilitat":rendibilitat,"Màxim drawdown":caiguda_mes_gran,"Volatilitat":volatilitat,"Sharpe":sharpe,"Capital Màxim": capital_max,"Capital mínim":capital_min,
-                            "Evolució capital": valor_BUY,"Evolució dates": dates_BUY,"Data inici":data_1,"Data final":data_2}
+                dicci_BH= {"Estratègia":"Buy&Hold","Empresa":empresa,"Capital inicial":capital,"Valor final":valor_final_BH,"Benefici":benefici,"Rendibilitat":rendibilitat,"Màxim Drawdown":caiguda_mes_gran,"Volatilitat":volatilitat,"Sharpe":sharpe,
+                            "Evolució capital": valor_BUY,"Evolució dates": dates_BUY,"Data inici":data_1,"Data final":data_2,}
                 
                 # Després de crear aquest diccionari amb totes les dades guardades l'afegeixo a la llista de   st.session_state.Simulacions_guardades amb .append
                 st.session_state.Simulacions_guardades.append(dicci_BH)
@@ -603,9 +595,10 @@ if st.session_state.simulacio_feta==True:
                 # Estableixo una condició on si l'opció de la frequència és la mensual, que s'executo el codi de adins
                 if DCA_opcions =="Mensual":
                    
-                    
+                    nombre_aportacions = taula.index.to_period("M").nunique()
+
                     # Creo la fórmula de la quantitat que entrará a cada més dividint el capital incial entre els mesos
-                    repartició_1= capital/mesos# quants diners en cada mes
+                    repartició_1= capital/nombre_aportacions# quants diners en cada mes
                     # PONER FÓRMULA
 
                     # Ara per crear el gràfic estableixo tres llistes
@@ -631,7 +624,7 @@ if st.session_state.simulacio_feta==True:
                     for dates_DCA_m in taula.index:
                          
                          # Amb això obtinc el preu d'obertura per cada valor a taula.index
-                         preu_dia=taula.loc[dates_DCA_m,"Open"]
+                         preu_dia=taula.loc[dates_DCA_m,"Close"]
 
                          # Transformo els anys a mesos amb *12
                          mes_actual = dates_DCA_m.year * 12 + dates_DCA_m.month
@@ -677,15 +670,14 @@ if st.session_state.simulacio_feta==True:
                                         })
                     
                     # Calculo el valor final del DCA
-                    valor_final_DCA=accions_totals*taula["Open"].iloc[-1]
+                    valor_final_DCA=accions_totals*taula["Close"].iloc[-1]
                     # PONER FÓRMULA DE TODAS
 
                     # Creo una variable del total invertit perquè potser el capital invertit no coincideix am el capital inicial
                     total_invertit=capital_metido_lista[-1]
 
                     # En el cas que això és compleixi el simulador anunciarà aquest fenòmen i et dira realment quant s'ha introduit
-                    if total_invertit!=capital:
-                          st.warning(f"El capital inicial era de {capital:.2f} USD, pero el capital real invertit ha estat de {total_invertit:.2f} USD")
+                  
 
                     # Càlculo el benefici del DCA
                     benefici_DCA= valor_final_DCA-total_invertit
@@ -727,7 +719,7 @@ if st.session_state.simulacio_feta==True:
 
                     # Faig el mateix proccés que en l'estratègia de buy&hold per aconseguir tots els detalls en el mateix recuadre ordenadament
 
-                    col_resultats,col3,col4,col5 = st.columns([3,1,1,1])
+                    col_resultats,col3,col4,col5 = st.columns([5,1,1,1])
                     with col_resultats:
                          with st.container(border=True):
                             col1,col2=st.columns(2)
@@ -736,28 +728,17 @@ if st.session_state.simulacio_feta==True:
                     with col1: 
 
                         # Ensenyo cuants diners entren cada més amb la divisó de repartició_1
-                        st.write(f"Quants diners hi entren al mes:{repartició_1:.2f} USD")
+                        st.write(f"Quants diners hi entren al mes: {repartició_1:,.2f} USD")
 
+                        st.write(f"Nombre d'accions comprades: {accions_totals:,.2f} ")
                         # Ensenyo el total invertit durant tota la inversió
-                        st.write(f"Total invertit:{total_invertit:.2f} USD")
-
+                        
                         # Ensenyo la rendibilitat del capital en percent
-                        st.write(f"Rendibilitat_DCA: {rendibilitat_DCA:.2f} %")
+                        st.write(f"Rendibilitat: {rendibilitat_DCA:,.2f} %")
 
-                        # Per aconseguir fer el drawdown torno a crear una altra taula de pandas de la llista de valors amb pd.Series, i gràcies amb .cummax aconsegueixo registrar obtenir el número més gran amb relació amb el anterior
-                        maxims_acumulats=pd.Series(valor_DCA_m).cummax().dropna()
-                        # https://pandas.pydata.org/docs/reference/api/pandas.Series.cummax.html
-
-                        # Ara creo la variable de drawdown i establexo una altra taula amb la seva fórmula corresponent en percent
-                        drawdonw=((pd.Series(valor_DCA_m)/(maxims_acumulats))-1)*100
-                        # PONER FÓRMULA
-
-                        # Amb -min de la taula de drawdown agafo el número més petit, és a dir la caiguda més gran (drawdonw) ja que estan en percents negatius
-                        caiguda_mes_gran=drawdonw.min()
                         
                         
-                        # Represento el resultat del màxim drawdonw
-                        st.write(f"Màxim Drawdown:{caiguda_mes_gran:.2f} %")
+                        
 
 
                         # Com per calcular el sharpe necessito els rendiments hem de calularlos bé
@@ -811,34 +792,37 @@ if st.session_state.simulacio_feta==True:
                         # Creo la variable de volatilitat on poso la seva fórmula corresponent
                         volatilitat = rendiments_diaris.std() * (252 ** 0.5) * 100
 
+                        valor_sense_aportacions=(1+rendiments_diaris).cumprod()
+
+                        maxims=valor_sense_aportacions.cummax()
+
+                        drawdonw=(valor_sense_aportacions/maxims -1)*100
+
+                        caiguda_mes_gran=drawdonw.min()
+
+
+                        # Represento el resultat del màxim drawdonw
+                        st.write(f"Màxim Drawdown: {caiguda_mes_gran:,.2f} %")
                         # Represento la volatilitat
-                        st.write(f"Volatilitat: {volatilitat:.2f} %")
+                        st.write(f"Volatilitat: {volatilitat:,.2f} %")
                     
                         # Represento el sharpe
-                        st.write(f"Sharpe: {sharpe:.2f}")
+                        st.write(f"Sharpe: {sharpe:,.2f}")
 
                         # Per al capital màxim agafo el valor més gran del capital de la taula de valors
-                        capital_max=max(valor_DCA_m)
-                        # Per al capital màxim agafo el valor més gran del capital de la taula de valors
-                        capital_min=min(valor_DCA_m)
-
-                        # Represento el capital màxim arribat
-                        st.write(f"Capital màxim: {capital_max:.2f} USD")
-
-                        # Represento el capital mínim arribat
-                        st.write(f"Capital mínim: {capital_min:.2f} USD")
+                       
 
                     # Segona columna
                     with col2:
                         # Represento el resultat de benefici amb números més grans
                         st.metric(
                              label="Benefici del DCA:",
-                             value= f"{benefici_DCA:.2f} USD")
+                             value= f"{benefici_DCA:,.2f} USD")
                         
                         # Represento el resultat del valor final de la simulació amb la mateixa mida que el benefici
                         st.metric(
                             label="Valor final del DCA:",
-                            value= f"{valor_final_DCA:.2f} USD") #AQUEST NO ÉS EL PREU DE L'ÚLTIMA COMPRA, sinó el preu que té l'acció quan acaba el període de simulació, el preu que "té avui"
+                            value= f"{valor_final_DCA:,.2f} USD") #AQUEST NO ÉS EL PREU DE L'ÚLTIMA COMPRA, sinó el preu que té l'acció quan acaba el període de simulació, el preu que "té avui"
 
                     
                     # Creo el boto de l'opció de poder guardar la simulació
@@ -865,8 +849,8 @@ if st.session_state.simulacio_feta==True:
 
                         # En el cas que no s'activi, és a dir, continui en false, llavors creo un diccionari (dicci_BH) el qual guarda: L'estratègia, l'empresa, el capital inicial, el valor fianl, el benefici, la rendibilitat, el màxim drawdown, la volatilitat, el sharpe, el capital màxim i el capital mínim, l'evolució del capital, és a dir la llista dels valors, la evolució de les dates, és a dir, la llista de totes les dates, la data d'inici i la data final i la frequència
                         else:
-                            dicci_DCM= {"Estratègia":"DCA mensual","Empresa":empresa,"Capital inicial":capital,"Valor final":valor_final_DCA,"Benefici":benefici_DCA,"Rendibilitat":rendibilitat_DCA,"Màxim Drawdown":caiguda_mes_gran,"Volatilitat":volatilitat,"Sharpe":sharpe,"Capital Màxim": capital_max,"Capital mínim":capital_min,
-                                        "Evolució capital":valor_DCA_m,"Evolució dates": dates_DCA_m,"Data inici":data_1,"Data final":data_2,"Frequència":DCA_opcions}
+                            dicci_DCM= {"Estratègia":"DCA mensual","Empresa":empresa,"Capital inicial":capital,"Valor final":valor_final_DCA,"Benefici":benefici_DCA,"Rendibilitat":rendibilitat_DCA,"Màxim Drawdown":caiguda_mes_gran,"Volatilitat":volatilitat,"Sharpe":sharpe,
+                                        "Evolució capital":valor_DCA_m,"Evolució dates": dates_DCA_m_llista,"Data inici":data_1,"Data final":data_2,"Frequència":DCA_opcions}
                             
                             # Després de crear aquest diccionari amb totes les dades guardades l'afegeixo a la llista de   st.session_state.Simulacions_guardades amb .append
                             st.session_state.Simulacions_guardades.append(dicci_DCM)
@@ -914,7 +898,7 @@ if st.session_state.simulacio_feta==True:
 
                      # Creo un loop amb la varibale dates_DCA_a perquè vagi recorrent tots els elements de la taula de l'empresa
                      for dates_DCA_a in taula.index:
-                          preu_dia=taula.loc[dates_DCA_a,"Open"]
+                          preu_dia=taula.loc[dates_DCA_a,"Close"]
 
                           # Amb això obtinc l'any actual
                           any_actual= dates_DCA_a.year
@@ -950,14 +934,13 @@ if st.session_state.simulacio_feta==True:
                           capital_invertido_lista.append(capital_invertido)
 
                      # A més calculo el valor de cada dia 
-                     valor_final_DCA_a= accions_totals*taula["Open"].iloc[-1]
+                     valor_final_DCA_a= accions_totals*taula["Close"].iloc[-1]
 
                      # Creo una variable del total invertit perquè potser el capital invertit no coincideix am el capital inicial                                           
                      total_invertit_a=capital_invertido_lista[-1]
 
                      # # En el cas que això és compleixi el simulador anunciarà aquest fenòmen i et dira realment quant s'ha introduit
-                     if total_invertit_a!=capital:
-                            st.warning(f"El capital inicial era de {capital:.2f} USD, pero el capital real invertit ha estat de {total_invertit_a:.2f} USD")
+                   
 
                      # Càlculo el benefici del DCA
                      benefici_DCA_a= valor_final_DCA_a-total_invertit_a
@@ -999,7 +982,7 @@ if st.session_state.simulacio_feta==True:
 
                     # Faig el mateix proccés que en l'estratègia de buy&hold per aconseguir tots els detalls en el mateix recuadre ordenadament
                      
-                     col_resultats,col3,col4,col5 = st.columns([3,1,1,1])#dependiendo de los numeors ya ponemso el numoer de columnas que queremos
+                     col_resultats,col3,col4,col5 = st.columns([5,1,1,1])#dependiendo de los numeors ya ponemso el numoer de columnas que queremos
                      with col_resultats:
                             with st.container(border=True):
                                 col1,col2=st.columns(2)
@@ -1007,26 +990,18 @@ if st.session_state.simulacio_feta==True:
                      # Segona columna
                      with col1: 
                              # Ensenyo cuants diners entren cada més amb la divisó de repartició_1
-                            st.write(f"Quants diners hi entren a l'any :{repartició_dels_anys:.2f} €")
+                            st.write(f"Quants diners hi entren a l'any : {repartició_dels_anys:,.2f} USD")
 
-                             # Ensenyo el total invertit durant tota la inversió
-                            st.write(f"Total invertit: {total_invertit_a:.2f} USD")
+                            st.write(f"Nombre d'accions comprades: {accions_totals:,.2f}")
+
+                        
+                           
 
                              # Ensenyo la rendibilitat del capital en percent
-                            st.write(f"Rendibilitat : {rendibilitat_DCA_a:.2f} %")
-
-                             # Per aconseguir fer el drawdown torno a crear una altra taula de pandas de la llista de valors amb pd.Series, i gràcies amb .cummax aconsegueixo registrar obtenir el número més gran amb relació amb el anterior
-                            maxims_acumulats=pd.Series(valor_DCA_a).cummax()
-
-                             # Ara creo la variable de drawdown i establexo una altra taula amb la seva fórmula corresponent en percent
-                            drawdonw=((pd.Series(valor_DCA_a)/(maxims_acumulats))-1)*100
+                            st.write(f"Rendibilitat : {rendibilitat_DCA_a:,.2f} %")
 
 
-                             # Amb -min de la taula de drawdown agafo el número més petit, és a dir la caiguda més gran (drawdonw) ja que estan en percents negatius
-                            caiguda_mes_gran=drawdonw.min()
-
-                            # Represento el resultat del màxim drawdonw                                      
-                            st.write(f"Màxim Drawdown:{caiguda_mes_gran:.2f} %")# aqui tenemos en cuenta las aportaciones
+                        
 
                             # Com per calcular el sharpe necessito els rendiments hem de calularlos bé
                             # Si no ho faig això estariem calculant els rendiments també els dies que s'invirteix, és a dir que es fan aportacions, i el rendiment es veuria molt afectat a l'alça
@@ -1072,35 +1047,35 @@ if st.session_state.simulacio_feta==True:
                              # Creo la variable de volatilitat on poso la seva fórmula corresponent
                             volatilitat = rendiments.std() * (252 ** 0.5) * 100
 
+                            valor_sense_aportacions=(1+rendiments).cumprod()
+                            
+                            maxims=valor_sense_aportacions.cummax()
+    
+                            drawdonw=(valor_sense_aportacions/maxims -1)*100
+    
+                            caiguda_mes_gran=drawdonw.min()
+
+                             # Represento el resultat del màxim drawdonw                                      
+                            st.write(f"Màxim Drawdown: {caiguda_mes_gran:,.2f} %")
+
                             # Represento la volatilitat
-                            st.write(f"Volatilitat: {volatilitat:.2f} %")
+                            st.write(f"Volatilitat: {volatilitat:,.2f} %")
 
                             # Represento el sharpe
-                            st.write(f"Sharpe: {sharpe:.2f}")
-
-                             # Per al capital màxim agafo el valor més gran del capital de la taula de valors
-                            capital_max_a=max(valor_DCA_a)
-
-                             # Per al capital màxim agafo el valor més gran del capital de la taula de valors
-                            capital_min_a=min(valor_DCA_a)
-
-                              # Represento el capital màxim arribat
-                            st.write(f"Capital màxim: {capital_max_a:.2f} USD")
-
-                               # Represento el capital mínim arribat
-                            st.write(f"Capital mínim: {capital_min_a:.2f} USD")
+                            st.write(f"Sharpe: {sharpe:,.2f}")
+                   
 
                      # Segona columna
                      with col2:
                              # Represento el resultat de benefici amb números més grans
                             st.metric(
                                 label="Benefici del DCA:",
-                                value= f"{benefici_DCA_a:.2f} USD")
+                                value= f"{benefici_DCA_a:,.2f} USD")
 
                              # Represento el resultat del valor final de la simulació amb la mateixa mida que el benefici
                             st.metric(
                                 label="Valor final del DCA:",
-                                value= f"{valor_final_DCA_a:.2f} USD")
+                                value= f"{valor_final_DCA_a:,.2f} USD")
                      
                      
                       # Creo el boto de l'opció de poder guardar la simulació
@@ -1126,7 +1101,7 @@ if st.session_state.simulacio_feta==True:
                                 st.warning("No es pot repetir la mateixa simulació")
                         # # En el cas que no s'activi, és a dir, continui en false, llavors creo un diccionari (dicci_BH) el qual guarda: L'estratègia, l'empresa, el capital inicial, el valor fianl, el benefici, la rendibilitat, el màxim drawdown, la volatilitat, el sharpe, el capital màxim i el capital mínim, l'evolució del capital, és a dir la llista dels valors, la evolució de les dates, és a dir, la llista de totes les dates, la data d'inici i la data final i la frequència
                         else:
-                            dicci_DC_A= {"Estratègia":"DCA anual","Empresa":empresa,"Capital inicial":capital,"Valor final":valor_final_DCA_a,"Benefici":benefici_DCA_a,"Rendibilitat":rendibilitat_DCA_a,"Màxim Drawdown":caiguda_mes_gran,"Volatilitat":volatilitat,"Sharpe":sharpe,"Capital Màxim": capital_max_a,"Capital mínim":capital_min_a,
+                            dicci_DC_A= {"Estratègia":"DCA anual","Empresa":empresa,"Capital inicial":capital,"Valor final":valor_final_DCA_a,"Benefici":benefici_DCA_a,"Rendibilitat":rendibilitat_DCA_a,"Màxim Drawdown":caiguda_mes_gran,"Volatilitat":volatilitat,"Sharpe":sharpe,
                                         "Evolució capital": valor_DCA_a,"Evolució dates": dates_DCA_a_llista,"Data inici":data_1,"Data final":data_2,"Frequència":DCA_opcions}
 
                             # Després de crear aquest diccionari amb totes les dades guardades l'afegeixo a la llista de   st.session_state.Simulacions_guardades amb .append
@@ -1143,7 +1118,7 @@ if st.session_state.simulacio_feta==True:
     elif estratègia == "Stop-Loss i Take-Profit":
 
         # Divideixo el capital inicial entre el preu open del primer dia, d'aquesta manera obtinc el nombre total d'accions que podem comprar
-        accions_comprades= capital/taula["Open"]    .iloc[0]
+        accions_comprades= capital/taula["Open"].iloc[0]
 
         # Subtítol
         st.subheader("Tria els percentatges")
@@ -1169,7 +1144,7 @@ if st.session_state.simulacio_feta==True:
         # Ara creo la varible del capital on ha d'arribar per a que es pari
         capital_stop_loss=preu_Stop_Loss*accions_comprades
         # També marco el valor per a que ja es sapigue al començament
-        st.markdown(f"###### Valor: {capital_stop_loss:.2f} USD")
+        st.markdown(f"###### Valor: {capital_stop_loss:,.2f} USD")
 
 
 
@@ -1178,8 +1153,8 @@ if st.session_state.simulacio_feta==True:
         Take_Profit= st.slider(
         label="Take-Profit",
         min_value=1,
-        max_value=100,
-        value=20,
+        max_value=300,
+        value=50,
         step=1,
         on_change=canvi_percentatges
                 )
@@ -1192,7 +1167,7 @@ if st.session_state.simulacio_feta==True:
         capital_take_profit= preu_Take_Profit*accions_comprades
 
         # També marco el valor per a que ja es sapigue al començament
-        st.markdown(f"###### Valor:{capital_take_profit:.2f} USD")
+        st.markdown(f"###### Valor:{capital_take_profit:,.2f} USD")
 
 
 
@@ -1229,7 +1204,7 @@ if st.session_state.simulacio_feta==True:
                 # Creo un loop on amb la varibale dates_ST_act vagi recorrent tots els elements de la taula de l'empresa, en aquest cas dies, gràcias a .index ja que aquesta columna pertany als dies
             for dates_ST_act in taula.index:
                         # Aqui obteninc cada preu d'obertura d'aquell dia
-                        preu_dia=taula.loc[dates_ST_act,"Open"]
+                        preu_dia=taula.loc[dates_ST_act,"Close"]
 
                         # Aqui aconsegueixo el valor més baix d'aquell dia per donar més realisme a la simulació
                         preu_minim=taula.loc[dates_ST_act,"Low"]
@@ -1240,70 +1215,72 @@ if st.session_state.simulacio_feta==True:
                         #Nota: si un dia llega a ambos topes siempre nos marcar ael stop loss-- decirlo en TDR
 
                         # Si el preu minim d'aquell dia supera o iguala el valor del preu_Stop_Loss entra en aquesta condició
-                        if preu_minim <= preu_Stop_Loss:
-
-                            # Després creo una variable on si es dona aquesta condició preu_dia_ST pasi a ser el preu de Stop_loss
-                            preu_dia_ST=preu_Stop_Loss
-
-                            # I que el motiu de la parada sigui el texte de "stop"
-                            motiu_parada="stop"
-                            
-
-                            # Ara calculo l'últim valor del capital on es va parar la simualció
-                            capital_dia_ST=accions_comprades*preu_Stop_Loss
-
-                            # I l'agefeixo a la llista dels capitals
-                            capital_ST.append(capital_dia_ST)
-
-                            # I l'última data també
-                            dates_ST.append(dates_ST_act)
-
-
-                            # Després d'això directament ja no es calcula res mes, s'atura la simulació gràcies al break
-                            break
-                            # https://www.geeksforgeeks.org/python/python-break-statement/
-
+                        
 
                             # Si el preu maxim d'aquell dia supera o iguala el valor del preu_Take_Profit entra en aquesta condició
-                        elif preu_maxim >= preu_Take_Profit: # ejemplo si tope es 130 i tk es 120 estonces que se activ  proque para ellgar al 130 tien que pasar por el 120
+                        if preu_maxim >= preu_Take_Profit: # ejemplo si tope es 130 i tk es 120 estonces que se activ  proque para ellgar al 130 tien que pasar por el 120
 
-                            # Després creo una variable on si es dona aquesta condició preu_dia_ST pasi a ser el preu de Take profit
-                            preu_dia_ST=preu_Take_Profit
+                             # Després creo una variable on si es dona aquesta condició preu_dia_ST pasi a ser el preu de Take profit
+                             preu_dia_ST=preu_Take_Profit
 
-                            # I que el la variable de motiu_parada sigui el texte "take"
-                            motiu_parada="take"
+                             # I que el la variable de motiu_parada sigui el texte "take"
+                             motiu_parada="take"
 
                             
                                 # Ara calculo l'últim valor del capital on es va parar la simualció
-                            capital_dia_ST=accions_comprades*preu_Take_Profit
+                             capital_dia_ST=accions_comprades*preu_Take_Profit
 
                                 # I l'agefeixo a la llista dels capitals
-                            capital_ST.append(capital_dia_ST)
+                             capital_ST.append(capital_dia_ST)
 
                                 # I l'última data també
-                            dates_ST.append(dates_ST_act)
+                             dates_ST.append(dates_ST_act)
 
                                 # Després d'això directament ja no es calcula res mes, s'atura la simulació gràcies al break
                                 
-                            break
+                             break
+
+                        elif preu_minim <= preu_Stop_Loss:
+                        
+                                                    # Després creo una variable on si es dona aquesta condició preu_dia_ST pasi a ser el preu de Stop_loss
+                                                    preu_dia_ST=preu_Stop_Loss
+                        
+                                                    # I que el motiu de la parada sigui el texte de "stop"
+                                                    motiu_parada="stop"
+                                                    
+                        
+                                                    # Ara calculo l'últim valor del capital on es va parar la simualció
+                                                    capital_dia_ST=accions_comprades*preu_Stop_Loss
+                        
+                                                    # I l'agefeixo a la llista dels capitals
+                                                    capital_ST.append(capital_dia_ST)
+                        
+                                                    # I l'última data també
+                                                    dates_ST.append(dates_ST_act)
+                        
+                        
+                                                    # Després d'això directament ja no es calcula res mes, s'atura la simulació gràcies al break
+                                                    break
+                                                    # https://www.geeksforgeeks.org/python/python-break-statement/
+                        
 
                         # En el cas que no sobrepasi o igual qualsevol limit llavors la simulació segueix fins el seu últim dia
                         else:
 
-                            # El preu_dia_ST serà el preu d'obertura d'aquell dia
-                            preu_dia_ST=preu_dia
+                             # El preu_dia_ST serà el preu d'obertura d'aquell dia
+                             preu_dia_ST=preu_dia
+  
+                             # I la variable motiu_parada serà el texte "no_top"
+                             motiu_parada="no_top"
 
-                            # I la variable motiu_parada serà el texte "no_top"
-                            motiu_parada="no_top"
+                             # I també es calcula el valor durant la simulació
+                             capital_dia_ST=accions_comprades*preu_dia_ST
 
-                            # I també es calcula el valor durant la simulació
-                            capital_dia_ST=accions_comprades*preu_dia_ST
+                             # A més d'afegir cada valor a la llista dels capitals
+                             capital_ST.append(capital_dia_ST)
 
-                            # A més d'afegir cada valor a la llista dels capitals
-                            capital_ST.append(capital_dia_ST)
-
-                            # Igual que faig amb les dates
-                            dates_ST.append(dates_ST_act)
+                             # Igual que faig amb les dates
+                             dates_ST.append(dates_ST_act)
 
 
 
@@ -1334,7 +1311,7 @@ if st.session_state.simulacio_feta==True:
 
             
             # El valor final haurà de ser l'últim element de la llista de capital_ST
-            valor_final_ST = capital_ST[-1]
+            valor_final_ST =  preu_dia_ST*accions_comprades
 
             # Creo la fórmula per aconseguir el benefici
             benefici= valor_final_ST-capital
@@ -1344,7 +1321,7 @@ if st.session_state.simulacio_feta==True:
 
                 # Aqui per causes d'estètica creo diferents columnes amb diferents mides per aconseguir un recuadra remarcat on es detalli tots els detalls de la simulació
                 # Les columens 3,4,5 només són espais
-            col_resultats,col3,col4,col5 = st.columns([3,1,1,1])#dependiendo de los numeors ya ponemso el numoer de columnas que queremos
+            col_resultats,col3,col4,col5 = st.columns([5,1,1,1])#dependiendo de los numeors ya ponemso el numoer de columnas que queremos
 
             # A la columna del recuadre dels detalls torno a crear dues columens per posar les dates de diferents mides depenent l'importància
             with col_resultats:
@@ -1371,10 +1348,10 @@ if st.session_state.simulacio_feta==True:
                     st.write("La simulació no ha arribat a cap màxim i mínim")
 
                     # Creo un string (f) per aconseguir posar el número que vull del nombre d'accions totals arrodonit a 2 decimals              
-                st.write(f"Accions comprades: {accions_comprades:.2f} ") 
+                st.write(f"Nombre d'accions comprades: {accions_comprades:,.2f} ") 
 
                 # Creo la variable de rendebilitat mitjançant la fórmula
-                st.write(f"Rendibilitat : {rendibilitat:.2f} %") 
+                st.write(f"Rendibilitat : {rendibilitat:,.2f} %") 
 
                 # Per aconseguir fer el drawdown torno a crear una altra taula de pandas de la llista de valors amb pd.Series, i gràcies amb .cummax aconsegueixo registrar obtenir el número més gran amb relació amb el anterior
                 maxims_acumulats=pd.Series(capital_ST).cummax()
@@ -1386,7 +1363,7 @@ if st.session_state.simulacio_feta==True:
                 caiguda_mes_gran=drawdonw.min()
 
                 # I represento el resultat del màxim drawdonw                       
-                st.write(f"Màxim Drawdown:{caiguda_mes_gran:.2f} %")
+                st.write(f"Màxim Drawdown: {caiguda_mes_gran:,.2f} %")
 
                 # Creo una nova taula de pandas de la llista de valor_BUY, després amb .pct_change calculo el canvi que hi ha hagut entre el valors anteriors i els actuals, és a dir el percentatge de diferència que hi ha hagut d'un valor a un altre
                 # Amb .dropna m'ajuda a borrar aquella primera filera ja que com no té un valor anterior em sortiria None
@@ -1396,7 +1373,7 @@ if st.session_state.simulacio_feta==True:
                 volatilitat = rendiments.std() * (252 ** 0.5) * 100
 
                     # Represento la volatilitat
-                st.write(f"Volatilitat: {volatilitat:.2f} %")
+                st.write(f"Volatilitat: {volatilitat:,.2f} %")
 
                 # Creo la variable de que la taxa de risc és de 0
                 taxa_sense_risc = 0
@@ -1407,18 +1384,18 @@ if st.session_state.simulacio_feta==True:
                 sharpe = (rendiments.mean() - taxa_sense_risc) / rendiments.std() * (252 ** 0.5)
 
                 # I represento el valor de Sharpe
-                st.write(f"Sharpe: {sharpe:.2f}")
+                st.write(f"Sharpe: {sharpe:,.2f}")
 
             with col2:   
                     # Represento el resultat de benefici amb números més grans
                 st.metric(
                     label="Benefici:",
-                    value= f"{benefici:.2f} USD")
+                    value= f"{benefici:,.2f} USD")
                 
                     # Represento el resultat del valor final de la simulació amb la mateixa mida que el benefici
                 st.metric(
                     label="Valor finals:",
-                    value= f"{valor_final_ST:.2f} USD")
+                    value= f"{valor_final_ST:,.2f} USD")
                                 
             
 
@@ -1447,7 +1424,7 @@ if st.session_state.simulacio_feta==True:
 
                     # En el cas que no s'activi, és a dir, continui en false, llavors creo un diccionari (dicci_BH) el qual guarda: L'estratègia, l'empresa, el capital inicial, el valor fianl, el benefici, la rendibilitat, el màxim drawdown, la volatilitat, el sharpe, el capital màxim i el capital mínim, l'evolució del capital, és a dir la llista dels valors, la evolució de les dates, és a dir, la llista de totes les dates, la data d'inici i la data final        
                 else:
-                    dicci_ST= {"Estratègia":"Stop-L i Take-P","Empresa":empresa,"Capital inicial":capital,"Valor final":valor_final_ST,"Benefici":benefici,"Rendibilitat":rendibilitat,"Màxim Drawdown":caiguda_mes_gran,"Volatilitat":volatilitat,"Sharpe":sharpe,"Capital Màxim": None,"Capital mínim":None,"Stop-Loss":Stop_Loss,"Take-Profit":Take_Profit,
+                    dicci_ST= {"Estratègia":"Stop-L i Take-P","Empresa":empresa,"Capital inicial":capital,"Valor final":valor_final_ST,"Benefici":benefici,"Rendibilitat":rendibilitat,"Màxim Drawdown":caiguda_mes_gran,"Volatilitat":volatilitat,"Sharpe":sharpe,"Stop-Loss":Stop_Loss,"Take-Profit":Take_Profit,
                             "Evolució capital":capital_ST,"Evolució dates":dates_ST,"Data inici":data_1,"Data final":data_2}
 
                     # Després de crear aquest diccionari amb totes les dades guardades l'afegeixo a la llista de   st.session_state.Simulacions_guardades amb .append
@@ -1469,7 +1446,7 @@ if st.session_state.simulacio_feta==True:
             for dates_ST_capital_max in taula.index:
 
                             # Obtinc el preu d'obertura
-                            preu_dia_ST=taula.loc[dates_ST_capital_max,"Open"]
+                            preu_dia_ST=taula.loc[dates_ST_capital_max,"Close"]
 
                             # I calculo el capital en aquell dia
                             capital_dia_ST_max=accions_comprades*preu_dia_ST
@@ -1500,9 +1477,7 @@ if st.session_state.simulacio_feta==True:
                 # Represento la fórmula de rendibilitat amb dos decimals en percent
             rentabilitat_max= (capital_ST_max[-1]-capital)/capital*100
 
-            # Estableixo el capital maxim i minim
-            capital_max_ST= max(capital_ST_max)
-            capital_min_ST= min(capital_ST_max)
+           
 
             # En el cas que el boto es premi entra aqui
             if Capital_max==True:
@@ -1524,24 +1499,22 @@ if st.session_state.simulacio_feta==True:
                     with col1: 
 
                         # Represento la rentabilitat
-                        st.write(f"Rentabilitat: {rentabilitat_max:.2f} %")
+                        st.write(f"Rentabilitat: {rentabilitat_max:,.2f} %")
 
-                        # Represneto el capital maxim i minim 
-                        st.write(f"Capital màxim:{capital_max_ST:.2f} USD")
-                        st.write(f"Capital mínim: {capital_min_ST:.2f} USD")
+                        
                                         
                     with col2:
 
                         # Represento el benefici en numeros grans
                         st.metric(
                             label="Benefici",
-                            value= f"{benefici_max:.2f} USD") 
+                            value= f"{benefici_max:,.2f} USD") 
 
                         # Represento el valor final en numeros grans
 
                         st.metric(
                         label="Valor final",
-                        value=f"{valor_final_ST_max:.2f} USD"
+                        value=f"{valor_final_ST_max:,.2f} USD"
                         )
                 
 
@@ -1574,7 +1547,7 @@ if st.session_state.simulacio_feta==True:
                 "Energia":["ExxonMobil","Chevron","NextEra Energy","AES","EQT"],
                 "Salut":["UnitedHealth Group","McKesson","CVS Health","Amgen","Pfizer"],
                 "Inmobiliari":["D.R. Horton","Lennar","Hovnanian Enterprises","PulteGroup","Toll Brothers"],
-                "Automoció":["Volkswagen","Toyota","PACCAR","Ford","Honda"],
+                "Automoció":["Volkswagen","Toyota   ","PACCAR","Ford","Honda"],
                 "Consum":["Walmart","Nestlé","Coca-Cola","PepsiCo","Procter&Gamble"]}#Creem això per a que ens deixi posar les mepreses i el sector al for, busacsr video
 
         # Creo dues liistes, una per les empreses_triades
@@ -1594,7 +1567,7 @@ if st.session_state.simulacio_feta==True:
         # Ara aqui vaig recorrent el número d'empreses seleccionades
         for i in range(número_empreses):
 
-            # Contorn
+            # Contorn   
             with st.container(border=True):# després mirar
                 ap1,ap2,ap3=st.columns(3)
 
@@ -1651,396 +1624,393 @@ if st.session_state.simulacio_feta==True:
                 st.write("No pot haver empreses repetides")
 
         # Si els percentages sumen 100 i no hi han empreses repetides entra en aquest if       
-        if sum(percentatges_triats)== 100 and len(empreses_triades)== len(set(empreses_triades)):
-         st.write(" ")
+        elif sum(percentatges_triats)== 100 and len(empreses_triades)== len(set(empreses_triades)):
+        
 
     
         
-        # Creo una llista de guardar_dades        
-        guardar_dades = []
+            # Creo una llista de guardar_dades        
+            guardar_dades = []
 
-        # I una variable que comença sent falsa (error_dates)
-        error_dates = False
+            # I una variable que comença sent falsa (error_dates)
+            error_dates = False
 
-        # Ara creo un loop per extreure tota la informació de yf per fer la simualció amb la variable de emrpesa_dades de la llista de totes les empreses triades   
-        for empresa_dades in empreses_triades:
+            # Ara creo un loop per extreure tota la informació de yf per fer la simualció amb la variable de emrpesa_dades de la llista de totes les empreses triades   
+            for empresa_dades in empreses_triades:
 
-                    # Creo una variable que busqui l'empresa triada al dicci_ticker i que aquesta variable guarda el ticker de l'empresa
-                ticker = dicci_tickers[empresa_dades]
+                        # Creo una variable que busqui l'empresa triada al dicci_ticker i que aquesta variable guarda el ticker de l'empresa
+                    ticker = dicci_tickers[empresa_dades]
 
-                    # Ara amb la variable de empresa_triada li dic a Yahoo finance que creii/cerqui el ticker d'abans per extreu-re l'informació
-                empresa_ticker = yh.Ticker(ticker)
+                        # Ara amb la variable de empresa_triada li dic a Yahoo finance que creii/cerqui el ticker d'abans per extreu-re l'informació
+                    empresa_ticker = yh.Ticker(ticker)
 
-                # Demano tot l'historial disponible de l'empresa
-                historial_empresa = empresa_ticker.history(period="max")
+                    # Demano tot l'historial disponible de l'empresa
+                    historial_empresa = empresa_ticker.history(period="max",auto_adjust=True)
+                    
 
-                # En el cas que alguna empresa no tingui dades en el periode de temps ntra aqui
-                if historial_empresa.empty:
-                    # T'avisa
-                    st.warning(f"No hi ha dades disponibles per a {empresa_dades}.")
-                    # I directament error_dates es torna positiu
-                    error_dates = True
+                    # En el cas que alguna empresa no tingui dades en el periode de temps ntra aqui
+                    if historial_empresa.empty:
+                        # T'avisa
+                        st.warning(f"No hi ha dades disponibles per a {empresa_dades}.")
+                        # I directament error_dates es torna positiu
+                        error_dates = True
 
-                    # I es para tot
-                    break
+                        # I es para tot
+                        break
 
-                # Primera data disponible de l'empresa
-                primera_data_empresa = historial_empresa.index[0].date()
+                    # Primera data disponible de l'empresa
+                    primera_data_empresa = historial_empresa.index[0].date()
 
-                # Si l'empresa va començar després de la data inicial escollida
-                if primera_data_empresa > data_1div:
-                    st.warning(
-                            # T'avisa que no té dades suficients per començar
-                        f"{empresa_dades} no té dades suficients per començar "
-                        f"la simulació el {data_1div}."
+                    # Si l'empresa va començar després de la data inicial escollida
+                    if primera_data_empresa > data_1div:
+                        st.warning(
+                                # T'avisa que no té dades suficients per començar
+                            f"{empresa_dades} no té dades suficients per començar la simulació el {data_1div}."
+                        )
+                        # I directament error_dates es torna positiu
+                        error_dates = True
+                    
+                        # Surt
+                        break
+
+                    # Agafo les dades del període seleccionat, és a dir la seva taula que em proporciona yh
+                    dades_taula = empresa_ticker.history(
+                        start=data_1div,
+                        end=data_2div,
+                        auto_adjust=True
                     )
-                    # I directament error_dates es torna positiu
-                    error_dates = True
 
-                    # Surt
-                    break
 
-                # Agafo les dades del període seleccionat, és a dir la seva taula que em proporciona yh
-                dades_taula = empresa_ticker.history(
-                    start=data_1div,
-                    end=data_2div
+                    # Aqui torno a comprobar que si exiteixen totes les dates
+                    if dades_taula.empty:
+                        st.warning(f"No hi ha dades per a {empresa_dades} en aquest període.")
+
+                        # I directament error_dates es torna positiu
+                        error_dates = True
+
+                        # I es para
+                        break
+
+                    # I afegeixo el periode de les dade de cada empresa a guardar dades
+                    guardar_dades.append(dades_taula)
+
+
+            # EN el cas que no hi hagi errors entra 
+            if not error_dates:
+
+                # Cerco les dates que tenen en comú totes les empreses, és a dir ara tenen totes el mateix període
+                    dates_comunes = guardar_dades[0].index
+
+
+                    # Després torno a recorrer totes les dades de la llista de dades
+                    for dades in guardar_dades[1:]:
+                        # https://www.askpython.com/python/list/x-in-a1-mean-python
+
+                        #I amb intersection agafa tots els valor que son completament iguals, així ara si tinc totes les dates iguals
+                        dates_comunes = dates_comunes.intersection(dades.index)
+                        # https://www.w3schools.com/python/ref_set_intersection.asp
+
+
+                    # En el cas que no tingui cap data de en comú t'avisa
+                    if len(dates_comunes) == 0:
+                        st.warning("Les empreses no tenen dates de cotització en comú.")
+
+                    #Si si que hi han dates entra
+                    else:
+
+                    # I em quedo només amb les dates comunes
+                        guardar_dades = [dades.loc[dates_comunes]
+
+                        # De cada dada  
+                        for dades in guardar_dades
+                        # https://elpythonista.com/list-comprehensions-python
+                    ]
+
+
+                    # A partir d'aquí continua la simulació
+
+                    # Gràcies al zip ajunto les empreses, els diners destinats i la taula on i son les dates corresponents.    
+                    dades_accions= zip(empreses_triades,distribució_gran,guardar_dades)
+                    # https://www.geeksforgeeks.org/python/zip-in-python/ 
+
+
+                    # Creo una llista de totes les empreses per fer-á utilizar al gràfic
+                    totes_les_empreses=[]
+
+                    # I també guardo els nombs de les empreses        
+                    noms_de_les_empreses=[]
+                    
+                
+                    
+                    # 
+                    valor_final_individual =[]
+
+                    dades_gràfic_empreses_individual={} #Volem un dicionari, si lo ponemls en le antes del for de despues todo se borrara caundo tenga una empresa, "como que limpia el diccionario"
+
+                    accions_totals=[]              
+
+                    # Aqui demano la emoresa, el capital i les dates al zip d'abans             
+                    for empresa,diners_distribució,taula in dades_accions:  
+
+                            # Demano el preu inicial
+                            open_preu= taula["Open"].iloc[0]
+
+                            # Creo el número d'accions comprades
+                            accions= diners_distribució/open_preu
+
+
+                            # El preu final de cada empresa
+                            end_preu = taula["Close"].iloc[-1]
+
+                            # Calculo el valor fial de cada emrpesa
+                            valor_final_1= end_preu*accions
+
+                            # I els afegeixo ala llista de valor_final_individual per a que no s'ajuntin totes les dades
+                            valor_final_individual.append(valor_final_1)
+                            
+                            # I el amteix amb els noms, a cada volta guarda el nom d'aquella empresa al loop
+                            noms_de_les_empreses.append(empresa)
+
+                            accions_totals.append(accions)
+
+                            # Creo una llista dels valors de cada empresa per a que sigui individual
+                            valors_de_cada_empresa=[]
+
+                                                                
+                            # Creo un loop que recorre cada data de la taula de index de yf
+                            for dates_DIS_act in taula.index:
+                                    # I calculo tots els preus de tots els dies
+                                    preu_dia=taula.loc[dates_DIS_act,"Close"]
+
+                                    # A més de calcular el seu valor
+                                    valor_dia=accions*preu_dia #las acciones no canvian, canvia su precio. EX:10 acciones, precio dia 2: 1100, 10 *110$, dia 3: 900, 10*90$
+
+                                    # I agefir-lo a la llista de els valors de cada empresa
+                                    valors_de_cada_empresa.append(valor_dia) # valors_de_cada_empresa ↓ [6000, 6050, 5900, 6100]
+
+
+                            # I vaig afegint tots els valors de cada empresa a la llista de totes_les_empreses per a tenir totes les empreses juntes    
+                            totes_les_empreses.append(valors_de_cada_empresa) 
+
+                            # Això asocia el nom de la empresa amb els valors de cada empresa per saber a quins coresponen
+                            dades_gràfic_empreses_individual[empresa]=valors_de_cada_empresa # aqui ponemos empresa porque asi cada vuelta detecta en que empresa esta en esa vuelta, si pusiera "APPLE" estaria mal
+                            
+
+                    # I creem una taula a partir de la associació de cada empresa amb els seus valors
+                    taula_de_cada_empresa_individual=pd.DataFrame( # No cal un diccionari perque ja tinc els nombs de les columnes
+                    dades_gràfic_empreses_individual)
+
+                    # Afegeixo una nova columna a la taula anterior anomenada dates on jo associo tots els valors amb les dates
+                    taula_de_cada_empresa_individual["Dates"]= dates_comunes 
+                            
+
+
+                    # Ara que ja tinc tots els valors de cada empresa els he de sumar per a crear un únic gràfic amb tots els valors
+                    #Primer creo la llista
+                    capital_total=[]
+
+                    # I per cada valor a la taual de toes les empreses vaig recorrent els valors desde el principi
+                    for i in range(len(totes_les_empreses[0])):#range no pot ser una lista
+                    # https://docs.python.org/es/3.7/tutorial/introduction.html
+
+                                        # Creo una variable per començar a el capital desde 0
+                                        capital_dia=0
+
+                                        # I un loop per recorre tot el capital d'una empresa en una
+                                        for empresa in totes_les_empreses:
+
+                                            capital_dia= capital_dia+ empresa[i] # [2000, 2000, 2200], valor de esta empresa en este dia
+
+                                        # I el vaig sumant    
+                                        capital_total.append(capital_dia)# tiene que estar fuera porque queremos guardar una solo suma por dia, no una suma por cada empresa
+                            
+                                
+                        # Ara que ja tinc a la llista tots els valors i dies de l'empresa ara el que faig és crear una altra taula amb dues columnes (diccionari) per posar-li nom
+                        # El primer el capital i després la data        
+                    taula_DIS = pd.DataFrame({
+                                        "Capital":capital_total,
+                                        "Data":dates_comunes
+                                })
+                
+                
+                
+
+                    # Creo el boto per començar la simualció
+                    boto_1= st.button(
+                        label="Començar simulació",
+
+                        # Key perquè sinó no funciona després quan li donem a guardar simualcio perque torna a llegir i aixì estarà apagat
+                        key="boto_diversificació"
+
+                        # MIRAR ESTO!!
                 )
 
-
-                # Aqui torno a comprobar que si exiteixen totes les dates
-                if dades_taula.empty:
-                    st.warning(f"No hi ha dades per a {empresa_dades} en aquest període.")
-
-                    # I directament error_dates es torna positiu
-                    error_dates = True
-
-                    # I es para
-                    break
-
-                # I afegeixo el periode de les dade de cada empresa a guardar dades
-                guardar_dades.append(dades_taula)
-
-
-        # EN el cas que no hi hagi errors entra 
-        if not error_dates:
-
-            # Cerco les dates que tenen en comú totes les empreses, és a dir ara tenen totes el mateix període
-                dates_comunes = guardar_dades[0].index
-
-
-                # Després torno a recorrer totes les dades de la llista de dades
-                for dades in guardar_dades[1:]:
-                    # https://www.askpython.com/python/list/x-in-a1-mean-python
-
-                    #I amb intersection agafa tots els valor que son completament iguals, així ara si tinc totes les dates iguals
-                    dates_comunes = dates_comunes.intersection(dades.index)
-                    # https://www.w3schools.com/python/ref_set_intersection.asp
-
-
-                # En el cas que no tingui cap data de en comú t'avisa
-                if len(dates_comunes) == 0:
-                    st.warning("Les empreses no tenen dates de cotització en comú.")
-
-                #Si si que hi han dates entra
-                else:
-
-                # I em quedo només amb les dates comunes
-                    guardar_dades = [dades.loc[dates_comunes]
-
-                    # De cada dada  
-                    for dades in guardar_dades
-                    # https://elpythonista.com/list-comprehensions-python
-                ]
-
-
-                # A partir d'aquí continua la simulació
-
-                # Gràcies al zip ajunto les empreses, els diners destinats i la taula on i son les dates corresponents.    
-                dades_accions= zip(empreses_triades,distribució_gran,guardar_dades)
-                # https://www.geeksforgeeks.org/python/zip-in-python/ 
-
-
-                # Creo una llista de totes les empreses per fer-á utilizar al gràfic
-                totes_les_empreses=[]
-
-                # I també guardo els nombs de les empreses        
-                noms_de_les_empreses=[]
-            
-                
-                # 
-                valor_final_individual =[]
-
-                dades_gràfic_empreses_individual={} #Volem un dicionari, si lo ponemls en le antes del for de despues todo se borrara caundo tenga una empresa, "como que limpia el diccionario"
-                                        
-
-                # Aqui demano la emoresa, el capital i les dates al zip d'abans             
-                for empresa,diners_distribució,taula in dades_accions:  
-
-                        # Demano el preu inicial
-                        open_preu= taula["Open"].iloc[0]
-
-                        # Creo el número d'accions comprades
-                        accions= diners_distribució/open_preu
-
-                        # El preu final de cada empresa
-                        end_preu = taula["Open"].iloc[-1]
-
-                        # Calculo el valor fial de cada emrpesa
-                        valor_final_1= end_preu*accions
-
-                        # I els afegeixo ala llista de valor_final_individual per a que no s'ajuntin totes les dades
-                        valor_final_individual.append(valor_final_1)
-                        
-                        # I el amteix amb els noms, a cada volta guarda el nom d'aquella empresa al loop
-                        noms_de_les_empreses.append(empresa)
-
-                        # Creo una llista dels valors de cada empresa per a que sigui individual
-                        valors_de_cada_empresa=[]
-
-                                                            
-                        # Creo un loop que recorre cada data de la taula de index de yf
-                        for dates_DIS_act in taula.index:
-                                # I calculo tots els preus de tots els dies
-                                preu_dia=taula.loc[dates_DIS_act,"Open"]
-
-                                # A més de calcular el seu valor
-                                valor_dia=accions*preu_dia #las acciones no canvian, canvia su precio. EX:10 acciones, precio dia 2: 1100, 10 *110$, dia 3: 900, 10*90$
-
-                                # I agefir-lo a la llista de els valors de cada empresa
-                                valors_de_cada_empresa.append(valor_dia) # valors_de_cada_empresa ↓ [6000, 6050, 5900, 6100]
-
-
-                        # I vaig afegint tots els valors de cada empresa a la llista de totes_les_empreses per a tenir totes les empreses juntes    
-                        totes_les_empreses.append(valors_de_cada_empresa) 
-
-                        # Això asocia el nom de la empresa amb els valors de cada empresa per saber a quins coresponen
-                        dades_gràfic_empreses_individual[empresa]=valors_de_cada_empresa # aqui ponemos empresa porque asi cada vuelta detecta en que empresa esta en esa vuelta, si pusiera "APPLE" estaria mal
-                        
-
-                # I creem una taula a partir de la associació de cada empresa amb els seus valors
-                taula_de_cada_empresa_individual=pd.DataFrame( # No cal un diccionari perque ja tinc els nombs de les columnes
-                dades_gràfic_empreses_individual)
-
-                # Afegeixo una nova columna a la taula anterior anomenada dates on jo associo tots els valors amb les dates
-                taula_de_cada_empresa_individual["Dates"]= dates_comunes 
-                        
-
-
-                # Ara que ja tinc tots els valors de cada empresa els he de sumar per a crear un únic gràfic amb tots els valors
-                #Primer creo la llista
-                capital_total=[]
-
-                # I per cada valor a la taual de toes les empreses vaig recorrent els valors desde el principi
-                for i in range(len(totes_les_empreses[0])):#range no pot ser una lista
-                # https://docs.python.org/es/3.7/tutorial/introduction.html
-
-                                    # Creo una variable per començar a el capital desde 0
-                                    capital_dia=0
-
-                                    # I un loop per recorre tot el capital d'una empresa en una
-                                    for empresa in totes_les_empreses:
-
-                                        capital_dia= capital_dia+ empresa[i] # [2000, 2000, 2200], valor de esta empresa en este dia
-
-                                    # I el vaig sumant    
-                                    capital_total.append(capital_dia)# tiene que estar fuera porque queremos guardar una solo suma por dia, no una suma por cada empresa
-                        
-                            
-                    # Ara que ja tinc a la llista tots els valors i dies de l'empresa ara el que faig és crear una altra taula amb dues columnes (diccionari) per posar-li nom
-                    # El primer el capital i després la data        
-                taula_DIS = pd.DataFrame({
-                                    "Capital":capital_total,
-                                    "Data":dates_comunes
-                            })
-                
-                
-                
-
-        # Creo el boto per començar la simualció
-        boto_1= st.button(
-            label="Començar simulació",
-
-            # Key perquè sinó no funciona després quan li donem a guardar simualcio perque torna a llegir i aixì estarà apagat
-            key="boto_diversificació"
-
-            # MIRAR ESTO!!
-    )
-
-        
-
-        # Si es prem el boto  st.session_state.boto_1 es True
-        if boto_1==True:
-            st.session_state.boto_1=True
-
-        # SI  st.session_state.boto_1 es True entra en aquest if
-        if st.session_state.boto_1 == True:
-
-                        # Divisor
-                        st.divider()
-                        # Subtitols
-                        st.subheader("Etapa 2")
-                        st.subheader("Gràfic total")
-
-                        # I creo el gràfic total de totes les empreses
-                        st.altair_chart(alt.Chart(taula_DIS).mark_line().encode(
-                            x="Data:T",
-                            y="Capital:Q"
-                        ).properties(height=600))
-
-                        # Calculo el valor final amb l'ultim valor del capital
-                        valor_final= capital_total[-1]
-
-                        # Faig la fórmula del benefici
-                        benefici= valor_final-capital
-
-                        # I la de rentabilitat
-                        rentabilitat= (valor_final-capital)/capital*100
-                        
-                        
-                        # Subtitol
-                        st.subheader("Detalls de la inversió")
-
-                        # Aqui per causes d'estètica creo diferents columnes amb diferents mides per aconseguir un recuadra remarcat on es detalli tots els detalls de la simulació
-                        # Les columens 3,4,5 només són espais
-                        col_resultats,col3,col4,col5 = st.columns([3,1,1,1])
-                        with col_resultats:
-                            with st.container(border=True):
-                                col1,col2=st.columns(2)
-
-
-                        with col1: 
-
-                            # Represento la fórmula de rendibilitat amb dos decimals en percent
-                            st.write(f"Rendibilitat : {rentabilitat:.2f} %") 
-
-                                # Per aconseguir fer el drawdown torno a crear una altra taula de pandas de la llista de valors amb pd.Series, i gràcies amb .cummax aconsegueixo registrar obtenir el número més gran amb relació amb el anterior
-                            maxims_acumulats=pd.Series(capital_total).cummax()
-
-                            # Ara creo la variable de drawdown i establexo una altra taula amb la seva fórmula corresponent en percent
-                            drawdonw=((pd.Series(capital_total)/(maxims_acumulats))-1)*100
-
-                                # Amb -min de la taula de drawdown agafo el número més petit, és a dir la caiguda més gran (drawdonw) ja que estan en percents negatius
-                            caiguda_mes_gran=drawdonw.min()
-
-                            # Represento el resultat del màxim drawdonw
-                            st.write(f"Màxim Drawdown:{caiguda_mes_gran:.2f} %")
-
-
-                            # Creo una nova taula de pandas de la llista de valor_BUY, després amb .pct_change calculo el canvi que hi ha hagut entre el valors anteriors i els actuals, és a dir el percentatge de diferència que hi ha hagut d'un valor a un altre
-                            # Amb .dropna m'ajuda a borrar aquella primera filera ja que com no té un valor anterior em sortiria None
-                            rendiments = pd.Series(capital_total).pct_change().dropna()
-
-                            # Creo la variable de que la taxa de risc és de 0                                                  
-                            taxa_sense_risc = 0
-
-                            # Ara amb la variable de sharpe faig el càlcul corresponent
-                            # .mean fa la mitjana de tota la llista del rendiments
-                            # .std conterteix tots els rendiments diaris en un únic valor que mostra quan han variat entre ells    
-                            sharpe = (rendiments.mean() - taxa_sense_risc) / rendiments.std() * (252 ** 0.5)
-
-                            # Creo la variable de volatilitat on poso la seva fórmula corresponent
-                            volatilitat = rendiments.std() * (252 ** 0.5) * 100
-
-                            # Represento la volatilitat
-                            st.write(f"Volatilitat: {volatilitat:.2f} %")
-
-                            # Represento el sharpe
-                            st.write(f"Sharpe:{sharpe:.2f}")
-
-                            # Per al capital màxim agafo el valor més gran del capital de la taula de valors
-                            capital_max_DI = max(capital_total)
-
-                            # Per al capital màxim agafo el valor més gran del capital de la taula de valors
-                            capital_min_DI = min(capital_total)
-
-                                # Represento el capital màxim arribat
-                            st.write(f"Capital màxim: {capital_max_DI:.2f} USD")
-
-                            # Represento el capital mínim arribat
-                            st.write(f"Capital mínim: {capital_min_DI:.2f} USD")
-                            
-                        with col2:   
-
-                            # Represento el resultat de benefici amb números més grans
-                            st.metric(
-                                label="Benefici:",
-                                value= f"{benefici:.2f} USD")
-
-                            # Represento el resultat del valor final de la simulació amb la mateixa mida que el benefici
-                            st.metric(
-                                label="Valor final:",
-                                value=f"{valor_final:.2f} USD"
-                            )
-                        
-                        # I seguidament ensenyo el gràfic de cada empresa
-                        st.subheader("Gràfic de cada empresa")
-                        st.altair_chart(alt.Chart(taula_de_cada_empresa_individual).transform_fold(noms_de_les_empreses).mark_line().encode(
-                            
-                            x="Dates:T",
-                            y="value:Q",
-                            color="key:N"
-
-                        ).properties(height=600))
-
-                        st.subheader("Detalls de la simulació:")
-                        o1,espai=st.columns([1,3])
                     
-                        with o1:
-                            with st.container(border=True):
+
+                    # Si es prem el boto  st.session_state.boto_1 es True
+                    if boto_1==True:
+                        st.session_state.boto_1=True
+
+                    # SI  st.session_state.boto_1 es True entra en aquest if
+                    if st.session_state.boto_1 == True:
+
+                                    # Divisor
+                                    st.divider()
+                                    # Subtitols
+                                    st.subheader("Etapa 2")
+                                    st.subheader("Gràfic total")
+
+                                    # I creo el gràfic total de totes les empreses
+                                    st.altair_chart(alt.Chart(taula_DIS).mark_line().encode(
+                                        x="Data:T",
+                                        y="Capital:Q"
+                                    ).properties(height=600))
+
+                                    # Calculo el valor final amb l'ultim valor del capital
+                                    valor_final= capital_total[-1]
+
+                                    # Faig la fórmula del benefici
+                                    benefici= valor_final-capital
+
+                                    # I la de rentabilitat
+                                    rentabilitat= (valor_final-capital)/capital*100
                                     
-                                    st.markdown("##### Valor final")
+                                    
+                                    # Subtitol
+                                    st.subheader("Detalls de la inversió")
 
-                                    # Creo aquest loop perque vagi recorrent totes les empreses i escrivint el seu valor final de la llista anterior
-                                    for i in range(len(noms_de_les_empreses)):
-                                            st.metric(
-                                                label=f"{noms_de_les_empreses[i]} USD",
-                                                value= f"{valor_final_individual[i]:.2f} USD")
+                                    # Aqui per causes d'estètica creo diferents columnes amb diferents mides per aconseguir un recuadra remarcat on es detalli tots els detalls de la simulació
+                                    # Les columens 3,4,5 només són espais
+                                    col_resultats,col3,col4,col5 = st.columns([5,1,1,1])
+                                    with col_resultats:
+                                        with st.container(border=True):
+                                            col1,col2=st.columns(2)
 
 
-                            # Creo el boto de l'opció de poder guardar la simulació
-                        guardar_simulació= st.button("Guardar simulacio")
+                                    with col1: 
 
-                        
-                        # En el cas que es premi el boto de guardar_simulació...
-                        if guardar_simulació ==True:
+                                        accions_totals_suma=sum(accions_totals)
+                                        st.write(f"Nombre d'accions comprades: {accions_totals_suma:,.2f}")
+                                        # Represento la fórmula de rendibilitat amb dos decimals en percent
+                                        st.write(f"Rendibilitat : {rentabilitat:,.2f} %") 
 
-                                # Creo una variable de simulacions_repetides i la denomino com a Falsa
-                            simulacions_repetides=False
+                                            # Per aconseguir fer el drawdown torno a crear una altra taula de pandas de la llista de valors amb pd.Series, i gràcies amb .cummax aconsegueixo registrar obtenir el número més gran amb relació amb el anterior
+                                        maxims_acumulats=pd.Series(capital_total).cummax()
 
-                                # Aqui estableixo un loop on detecta totes les dades de les demés simulacions que s'han guardat
-                                # Si es la primera simulació que es guarda, com la llista de st.sessions_state.Simulacions_guardades no està creada, és a dir és buida, per tant totes les condicions adins del loop no s'executarán
-                            for simulacions in st.session_state.Simulacions_guardades:
+                                        # Ara creo la variable de drawdown i establexo una altra taula amb la seva fórmula corresponent en percent
+                                        drawdonw=((pd.Series(capital_total)/(maxims_acumulats))-1)*100
 
-                                    # Estableixo una condició on si amb una altra simulació coincideix en el: Nom de l'estratègia, l'empresa, el capital inicial, la data inicial i la data final. Directament la variable de simulacions_repetides es torna True
-                                if (simulacions["Estratègia"]=="Diversificació" and simulacions["Empresa"]== ",".join(noms_de_les_empreses) and simulacions["Capital inicial"]==capital and simulacions["Data inici"]==data_1div and simulacions["Data final"]==data_2div):
-                                    simulacions_repetides=True
+                                            # Amb -min de la taula de drawdown agafo el número més petit, és a dir la caiguda més gran (drawdonw) ja que estan en percents negatius
+                                        caiguda_mes_gran=drawdonw.min()
 
-                                # En el cas que simulacions_repetides sigui True t'avisara amb el següent missatge        
-                            if simulacions_repetides==True:
-                                st.warning("No es pot repetir la mateixa simulació")
+                                        # Represento el resultat del màxim drawdonw
+                                        st.write(f"Màxim Drawdown: {caiguda_mes_gran:,.2f} %")
 
-                                # En el cas que no s'activi, és a dir, continui en false, llavors creo un diccionari (dicci_DI) el qual guarda: L'estratègia, l'empresa, el capital inicial, el valor fianl, el benefici, la rendibilitat, el màxim drawdown, la volatilitat, el sharpe, el capital màxim i el capital mínim, l'evolució del capital, és a dir la llista dels valors, la evolució de les dates, és a dir, la llista de totes les dates, la data d'inici i la data final    
-                            else:
-                                dicci_DI= {"Estratègia":"Diversificació","Empresa":",".join(noms_de_les_empreses),#join lo que hace es que el nombre de las emrpesas me las junta en solo un mismo texto TypeError: can only concatenate list (not "str") to list
-                                        "Capital inicial":capital,"Valor final":valor_final,"Benefici":benefici,"Rendibilitat":rentabilitat,"Màxim Drawdown":caiguda_mes_gran,"Volatilitat":volatilitat,"Sharpe":sharpe,"Capital Màxim":capital_max_DI,"Capital mínim":capital_min_DI,
-                                        "Evolució capital": capital_total,"Evolució dates":dates_comunes,"Data inici":data_1div,"Data final":data_2div}
 
-                                # Després de crear aquest diccionari amb totes les dades guardades l'afegeixo a la llista de   st.session_state.Simulacions_guardades amb .append
-                                st.session_state.Simulacions_guardades.append(dicci_DI)
+                                        # Creo una nova taula de pandas de la llista de valor_BUY, després amb .pct_change calculo el canvi que hi ha hagut entre el valors anteriors i els actuals, és a dir el percentatge de diferència que hi ha hagut d'un valor a un altre
+                                        # Amb .dropna m'ajuda a borrar aquella primera filera ja que com no té un valor anterior em sortiria None
+                                        rendiments = pd.Series(capital_total).pct_change().dropna()
 
-                                    # T'avisa que s'ha guardat
-                                st.write("Simulació guardada")
+                                        # Creo la variable de que la taxa de risc és de 0                                                  
+                                        taxa_sense_risc = 0
 
-                                # I torna a reiniciar el programa per a que així s'actualitzi la llista de les simulacions guardades
-                                st.rerun()
+                                        # Ara amb la variable de sharpe faig el càlcul corresponent
+                                        # .mean fa la mitjana de tota la llista del rendiments
+                                        # .std conterteix tots els rendiments diaris en un únic valor que mostra quan han variat entre ells    
+                                        sharpe = (rendiments.mean() - taxa_sense_risc) / rendiments.std() * (252 ** 0.5)
+
+                                        # Creo la variable de volatilitat on poso la seva fórmula corresponent
+                                        volatilitat = rendiments.std() * (252 ** 0.5) * 100
+
+                                        # Represento la volatilitat
+                                        st.write(f"Volatilitat: {volatilitat:,.2f} %")
+
+                                        # Represento el sharpe
+                                        st.write(f"Sharpe: {sharpe:,.2f}")
+
+                                    
+                                        
+                                    with col2:   
+
+                                        # Represento el resultat de benefici amb números més grans
+                                        st.metric(
+                                            label="Benefici:",
+                                            value= f"{benefici:,.2f} USD")
+
+                                        # Represento el resultat del valor final de la simulació amb la mateixa mida que el benefici
+                                        st.metric(
+                                            label="Valor final:",
+                                            value=f"{valor_final:,.2f} USD"
+                                        )
+                                    
+                                    # I seguidament ensenyo el gràfic de cada empresa
+                                    st.subheader("Gràfic de cada empresa")
+                                    st.altair_chart(alt.Chart(taula_de_cada_empresa_individual).transform_fold(noms_de_les_empreses).mark_line().encode(
+                                        
+                                        x="Dates:T",
+                                        y="value:Q",
+                                        color="key:N"
+
+                                    ).properties(height=600))
+
+                                    st.subheader("Detalls de la simulació:")
+                                    o1,espai=st.columns([1.6,3])
+                                
+                                    with o1:
+                                        with st.container(border=True):
+                                                
+                                                st.markdown("##### Valor final")
+
+                                                # Creo aquest loop perque vagi recorrent totes les empreses i escrivint el seu valor final de la llista anterior
+                                                for i in range(len(noms_de_les_empreses)):
+                                                        st.metric(
+                                                            label=f"{noms_de_les_empreses[i]} USD",
+                                                            value= f"{valor_final_individual[i]:,.2f} USD")
+
+
+                                        # Creo el boto de l'opció de poder guardar la simulació
+                                    guardar_simulació= st.button("Guardar simulacio")
+
+                                    
+                                    # En el cas que es premi el boto de guardar_simulació...
+                                    if guardar_simulació ==True:
+
+                                            # Creo una variable de simulacions_repetides i la denomino com a Falsa
+                                        simulacions_repetides=False
+
+                                            # Aqui estableixo un loop on detecta totes les dades de les demés simulacions que s'han guardat
+                                            # Si es la primera simulació que es guarda, com la llista de st.sessions_state.Simulacions_guardades no està creada, és a dir és buida, per tant totes les condicions adins del loop no s'executarán
+                                        for simulacions in st.session_state.Simulacions_guardades:
+
+                                                # Estableixo una condició on si amb una altra simulació coincideix en el: Nom de l'estratègia, l'empresa, el capital inicial, la data inicial i la data final. Directament la variable de simulacions_repetides es torna True
+                                            if (simulacions["Estratègia"]=="Diversificació" and simulacions["Empresa"]== ",".join(noms_de_les_empreses) and simulacions["Capital inicial"]==capital and simulacions["Data inici"]==data_1div and simulacions["Data final"]==data_2div):
+                                                simulacions_repetides=True
+
+                                            # En el cas que simulacions_repetides sigui True t'avisara amb el següent missatge        
+                                        if simulacions_repetides==True:
+                                            st.warning("No es pot repetir la mateixa simulació")
+
+                                            # En el cas que no s'activi, és a dir, continui en false, llavors creo un diccionari (dicci_DI) el qual guarda: L'estratègia, l'empresa, el capital inicial, el valor fianl, el benefici, la rendibilitat, el màxim drawdown, la volatilitat, el sharpe, el capital màxim i el capital mínim, l'evolució del capital, és a dir la llista dels valors, la evolució de les dates, és a dir, la llista de totes les dates, la data d'inici i la data final    
+                                        else:
+                                            dicci_DI= {"Estratègia":"Diversificació","Empresa":",".join(noms_de_les_empreses),#join lo que hace es que el nombre de las emrpesas me las junta en solo un mismo texto TypeError: can only concatenate list (not "str") to list
+                                                    "Capital inicial":capital,"Valor final":valor_final,"Benefici":benefici,"Rendibilitat":rentabilitat,"Màxim Drawdown":caiguda_mes_gran,"Volatilitat":volatilitat,"Sharpe":sharpe, "Evolució capital":  capital_total,"Evolució dates": dates_comunes,"Data inici":data_1div,"Data final":data_2div}
+
+                                            # Després de crear aquest diccionari amb totes les dades guardades l'afegeixo a la llista de   st.session_state.Simulacions_guardades amb .append
+                                            st.session_state.Simulacions_guardades.append(dicci_DI)
+
+                                                # T'avisa que s'ha guardat
+                                            st.write("Simulació guardada")
+
+                                            # I torna a reiniciar el programa per a que així s'actualitzi la llista de les simulacions guardades
+                                            st.rerun()
 
 
 
         # En el cas que la sume dels percentatges superi el 100% no et deixa avançar                   
         elif sum(percentatges_triats) > 100:
-         st.write("La suma dels percentatges no pot superar el 100%")
-         st.write("Intenta-ho modificar")
+            st.write("La suma dels percentatges no pot superar el 100%")
+            st.write("Intenta-ho modificar")
         # I el mateix si la suma és més petita que 100   
         elif sum(percentatges_triats) < 100: 
-         st.write("La suma dels percentatges ha de ser igual a 100%")
-         st.write("Intenta-ho modificar")
+            st.write("La suma dels percentatges ha de ser igual a 100%")
+            st.write("Intenta-ho modificar") 

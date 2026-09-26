@@ -1,8 +1,8 @@
-# S'importa la llibreria de streamlit per utilitzarla
+# Inicialment s'ha d'importar la llibreria de streamlit per fer-la servir
 import streamlit as st
 # https://docs.streamlit.io/get-started/installation
 
-# L'estructura de la pàgina cambia a totalment horitzontal per àmbits d'estètica
+# Amb aquesta funció l'estructura de la pàgina cambia a totalment horitzontal per àmbits d'estètica
 st.set_page_config(layout="wide")
 # https://docs.streamlit.io/develop/api-reference/configuration/st.set_page_config
 
@@ -40,11 +40,11 @@ with st.container(border=True):
     # #https://docs.streamlit.io/develop/api-reference/text/st.subheader 
 
     # Es creen diferents columnes per ordenar les diferents explicacions de les etapes
-    pas1,pas2,pas3 = st.columns(3)
+    col1,col2,col3 = st.columns(3)
     # #https://docs.streamlit.io/develop/api-reference/layout/st.columns 
 
     # S'indica que es traballarà dins de la primera columna:
-    with pas1:
+    with col1:
         # Es marca l'espai amb el delineat
         with st.container(border=True):
 
@@ -57,7 +57,7 @@ with st.container(border=True):
             # https://docs.streamlit.io/develop/api-reference/text/st.text
 
     # S'indica que es traballarà dins de la segona columna;            
-    with pas2:
+    with col2:
         # Es marca l'espai amb el delineat
         with st.container(border=True):
 
@@ -69,7 +69,7 @@ with st.container(border=True):
             st.text("Descobreix què hauria passat amb la teva hipotètica inversió.")
 
     # S'indica que es traballarà dins de la tercera columna; 
-    with pas3:
+    with col3:
 
         # Es marca l'espai amb el delineat
         with st.container(border=True):

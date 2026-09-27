@@ -1469,7 +1469,7 @@ if st.session_state.simulacio_feta==True:
                 )
 
                 # Creo la fórmula per aconseguir tenir el valor final de la simulacio amb b&H agafant l'ultim valor de la llsita de capitals
-            valor_final_ST_max = capital_ST_max[-1]
+            valor_final_ST_max = accions_comprades *taula["Close"].iloc[-1]
 
             # Creo la fórmula per aconseguir el benefici
             benefici_max= valor_final_ST_max-capital
@@ -1647,8 +1647,6 @@ if st.session_state.simulacio_feta==True:
                     # Demano tot l'historial disponible de l'empresa
                     dades_taula = empresa_ticker.history(start=data_1div,end=data_2div,auto_adjust=True)
             
-
-
                     # Aqui torno a comprobar que si exiteixen totes les dates
                     if dades_taula.empty:
                         st.warning(f"No hi ha dades per a {empresa_dades} en aquest període.")

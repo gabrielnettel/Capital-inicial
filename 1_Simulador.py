@@ -70,8 +70,7 @@ dicci_tickers= {
     # Automoció
     "Volkswagen": "VWAGY","Toyota": "TM","PACCAR": "PCAR","Ford": "F","Honda": "HMC",
 
-    # Consum
-    "Walmart": "WMT","Nestlé": "NSRGY","Coca-Cola": "KO","PepsiCo": "PEP","Procter&Gamble": "PG",
+   
     }
 #https://www.w3schools.com/python/python_dictionaries.asp 
 
@@ -95,9 +94,10 @@ with dades_inversió:
         st.header("Dades de la inversió")
         # https://docs.streamlit.io/develop/api-reference/text/st.header
 
-        # Demano el capital inicial amb una barra deslizable
+        # Es demana el capital inicial amb la barra lliscant
+        # El valor predeterminat és de 15000 $ i canvia el valor en intervanls de 100 $
         capital = st.slider(
-            label = "Introdueix el capital inicial:",
+            label = "Introdueix el capital inicial en $:",
             min_value= 100,
             max_value=50000,
             value= 15000,
@@ -1465,7 +1465,7 @@ if st.session_state.simulacio_feta==True:
             #MIRAR PORQUE NO HACE FALTA ST.SESSION_STATE I TU PORQUE LO PONES SI TOTAL AL FINAL LO CANCELAS OTRA VEZ
             # Després creo el boto per a que l'usuari pugui escogir l'opció sense topes
             Capital_max=st.button(
-                    label= "Si no hagués topes"  
+                    label= "Si no hagués límits"  
                 )
 
                 # Creo la fórmula per aconseguir tenir el valor final de la simulacio amb b&H agafant l'ultim valor de la llsita de capitals
@@ -1645,40 +1645,8 @@ if st.session_state.simulacio_feta==True:
                     empresa_ticker = yh.Ticker(ticker)
 
                     # Demano tot l'historial disponible de l'empresa
-                    historial_empresa = empresa_ticker.history(period="max",auto_adjust=True)
-                    
-
-                    # En el cas que alguna empresa no tingui dades en el periode de temps ntra aqui
-                    if historial_empresa.empty:
-                        # T'avisa
-                        st.warning(f"No hi ha dades disponibles per a {empresa_dades}.")
-                        # I directament error_dates es torna positiu
-                        error_dates = True
-
-                        # I es para tot
-                        break
-
-                    # Primera data disponible de l'empresa
-                    primera_data_empresa = historial_empresa.index[0].date()
-
-                    # Si l'empresa va començar després de la data inicial escollida
-                    if primera_data_empresa > data_1div:
-                        st.warning(
-                                # T'avisa que no té dades suficients per començar
-                            f"{empresa_dades} no té dades suficients per començar la simulació el {data_1div}."
-                        )
-                        # I directament error_dates es torna positiu
-                        error_dates = True
-                    
-                        # Surt
-                        break
-
-                    # Agafo les dades del període seleccionat, és a dir la seva taula que em proporciona yh
-                    dades_taula = empresa_ticker.history(
-                        start=data_1div,
-                        end=data_2div,
-                        auto_adjust=True
-                    )
+                    dades_taula = empresa_ticker.history(start=data_1div,end=data_2div,auto_adjust=True)
+            
 
 
                     # Aqui torno a comprobar que si exiteixen totes les dates

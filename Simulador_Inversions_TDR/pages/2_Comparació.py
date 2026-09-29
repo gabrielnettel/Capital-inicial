@@ -1,444 +1,506 @@
-# Importo totes les llibreries
+# LLIBRERIES
+# S'importa la llibreria Streamlit, necessària per crear la interfície de l'aplicació
 import streamlit as st
+
+# S'importa pandas per treballar i organitzar les dades en estructures tabulars
 import pandas as pd
+
+# S'importa Altair per crear gràfics a partir de les dades obtingudes
 import altair as alt
 
-# Congifuro per a que la pàgina sigui horitzontal
+
+# CONFIGURACIÓ DE LA PÀGINA
+# Es configura la pàgina perquè utilitzi tota l'amplada disponible
 st.set_page_config(
     layout="wide")
 
+# INICIALITZACIÓ DE LES VARIABLES DE SESSIÓ
+# Es comprova si existeix la llista de simulacions guardades
+# Si no existeix, es crea una llista buida per emmagatzemar les simulacions
+if "simulacions_guardades" not in st.session_state:
+       st.session_state.simulacions_guardades=[] 
 
-    
-# Establir una condició per a que  st.session_state.Simulacions_guardades sigui una llista i es vagi guardant tota l'estona a "l'armari"
-if "Simulacions_guardades" not in st.session_state:
-       st.session_state.Simulacions_guardades=[] 
 
-# # Comptador de simulacions guardades a l'esquerra
+# BARRA LATERAL I SIMULACIONS GUARDADES
+# Es crea la barra lateral per mostrar el nombre de simulacions guardades
 with st.sidebar:
 
-    # Espais
-    veces=16
-    for i in range(veces):
+    # Es defineix el nombre d'espais que es mostraran abans del comptador
+    espais_superiors=16
+    for i in range(espais_superiors):
         st.title(" ")
 
-     # SubtítolF
+
+     # MOSTRAR SIMULACIONS GUARDADES
+    # Es mostra el títol del comptador de simulacions guardades
     st.subheader("Simulacions guardades")
 
-    # Mostro el comptador de simulacions guardades ( només el numero)
+    # Es mostra el nombre de simulacions emmagatzemades a la sessió
     st.metric(
         label="Simulacions guardades",
-        value= len(st.session_state.Simulacions_guardades),
-        # Elimino el texte
+        value= len(st.session_state.simulacions_guardades),
+         # Es manté ocult el text de l'etiqueta
         label_visibility="collapsed"
     )
 
-# Títol 
+
+# TÍTOL DEL COMPARADOR DE SIMULACIONS
+# Es mostra el títol principal de la pàgina
 st.title("**COMPARACIÓ DE SIMULACIONS**")
 
-# En el cas que la llista de simulacons_guardades sigui major a 0, és a dir que hi hagi una o més entra aqui
-if len(st.session_state.Simulacions_guardades)>1:
-     # Subtitols
+
+# CREAR TARGETES DE LES SIMULACIONS
+# Es comprova si hi ha almenys dues simulacions guardades
+if len(st.session_state.simulacions_guardades)>1:
+     # Es mostra el títol corresponent a la tercera etapa
      st.subheader("Etapa 3")
+     # Es mostra el subtítol de les tarjetes de les simulacions
      st.subheader("Tarjetes de les simulacions: ")
 
-     # I creo una taula de tots els elements guardats de la simulació amb el seu valor corresponent
-     taula_simulacions_guardades= pd.DataFrame(st.session_state.Simulacions_guardades)
+     # Es crea un DataFrame a partir de la llista de simulacions guardades
+     dades_simulacions_guardades= pd.DataFrame(st.session_state.simulacions_guardades)
 
-     # Columnes
-     a1,a2=st.columns([1,1])
+     # Es creen dues columnes per distribuir les targetes de les simulacions
+     col1,col2=st.columns([1,1])
 
-     # Ara per cada element, el seu index, recorre una filera per una filera la taula de simulacions guardades gràcias a iterrows
-     for numero,fila in taula_simulacions_guardades.iterrows(): #posem número perquè sinó  tidnria (0,empresa) i llavors fila["empresa"] no funcionaria perquè tmb hi ha el número. iterrows pasa n´´umero por número
+     # Es recorren totes les files del DataFrame per obtenir les dades de cada simulació
+     for index_simulació,simulació in dades_simulacions_guardades.iterrows():
      # https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.iterrows.html
          
-          # En el cas que sigui el nombre del index parell entra en aquesta condicio
-          # De aquesta manera creo un mecanisme on si es parell es vegi la tarjetetea a la esquerra i si es imparell a la dreta
-          if numero % 2==0: #aqui mirem el residu
-
+          # Es comprova si la posició de la simulació és parella
+          # Les simulacions parelles es mostren a la columna esquerra
+          if index_simulació % 2==0: #aqui mirem el residu
           # https://www.geeksforgeeks.org/python/what-is-a-modulo-operator-in-python/    
-              # En la columna de la esquerra
-              with a1:
-                    # Amb contorn
+
+              # S'indica que es treballa amb la primera columna
+              with col1:
+
+                    # Es crea un contenidor amb una vora per agrupar la informació
                      with st.container(border=True):
-                          r1,r2=st.columns(2)# tiene que estar dentro del borde si quieres que se vea
-                          with r1:
 
-                              # Vaig a la fílera d'estràtegia i em retorna el seu valor
-                              st.subheader(fila["Estratègia"])
+                          # Es creen dues altres columnes dins del contenidor
+                          col3,col4=st.columns(2)# tiene que estar dentro del borde si quieres que se vea
 
-                              # Vaig a la fílera de l'empresa i em retorna el seu valor
-                              st.write("**Empresa**:", fila["Empresa"])
+                          # S'indica que es treballa amb la tercera columna
+                          with col3:
 
-                              # Vaig a la fílera deñ capital inicial i em retorna el seu valor
-                              st.write("**Capital inicial:**",f"{ fila["Capital inicial"]:,.2f} USD")
+                              # Es mostra l'estratègia corresponent a la simulació
+                              st.subheader(simulació["Estratègia"])
 
-                              # Vaig a la fílera del capital inicial i el capital final i em retorna el seu valor
-                              st.write("**Període:**",f"{fila["Data inici"]}","|",f"{fila["Data final"]}")
+                              # Es mostra l'empresa corresponent a la simulació
+                              st.write("**Empresa**:", simulació["Empresa"])
 
-                          with r2: 
-                              # Espais
+                               # Es mostra el capital inicial de la simulació
+                              st.write("**Capital inicial:**",f"{ simulació["Capital inicial"]:,.2f} USD")
+
+                              # Es mostra el període temporal de la simulació
+                              st.write("**Període:**",f"{simulació["Data inici"]}","|",f"{simulació["Data final"]}")
+
+                          # S'indica que es treballa amb la quarta columna
+                          with col3: 
+
+                              # Es creen espais per distribuir visualment la informació
                               st.write(" ")
                               st.write(" ")
                               st.write(" ")
 
-                              # Escric en gran el valor final de la simulació
+                              # Es mostra en gran el valor final de la simulació
                               st.metric(
                               label="**Valor final:**", 
-                              value= f"{fila["Valor final"]:,.2f} USD")  
+                              value= f"{simulació["Valor final"]:,.2f} USD")  
 
-          # Si el número es imparell entra en aquesta condició                   
+          # Si la posició és senar, la simulació es mostra a la columna dreta              
           else:
-              with a2:
-                  #Amb contorn
+
+              # S'indica que es treballa amb la segona columna
+              with col2:
+                  
+                  # Es crea un contenidor amb una vora per agrupar la informació
                   with st.container(border=True):
-                         r1,r2=st.columns(2)
 
-                         with r1:
+                         # Es creen dues altres columnes dins del contenidor
+                         col3,col4=st.columns(2)
 
-                              # Vaig a la fílera d'estràtegia i em retorna el seu valor
-                              st.subheader(fila["Estratègia"])
+                         # S'indica que es treballa amb la tercera columna
+                         with col3:
 
-                              # Vaig a la fílera de l'empresa i em retorna el seu valor
-                              st.write("**Empresa:**", fila["Empresa"])
+                              # Es mostra l'estratègia corresponent a la simulació
+                              st.subheader(simulació["Estratègia"])
 
-                              # Vaig a la fílera deñ capital inicial i em retorna el seu valor
-                              st.write("**Capital inicial:**",f"{ fila["Capital inicial"]:,.2f} USD")
+                              # Es mostra l'empresa corresponent a la simulació
+                              st.write("**Empresa:**", simulació["Empresa"])
 
-                              # Vaig a la fílera del capital inicial i el capital final i em retorna el seu valor
-                              st.write("**Període:**",f"{fila["Data inici"]}","|",f"{fila["Data final"]}")
+                              # Es mostra el capital inicial de la simulació
+                              st.write("**Capital inicial:**",f"{ simulació["Capital inicial"]:,.2f} USD")
 
-                         with r2:
-                              # Espais
+                              # Es mostra el període temporal de la simulació
+                              st.write("**Període:**",f"{simulació["Data inici"]}","|",f"{simulació["Data final"]}")
+
+                         # S'indica que es treballa amb la segona columna
+                         with col4:
+
+                              # Es creen espais per distribuir visualment la informació
                               st.write(" ")
                               st.write(" ")
                               st.write(" ")
 
-                              # Escric en gran el valor final de la simulació
+                              # Es mostra en gran el valor final de la simulació
                               st.metric(
                                label="**Valor final:**", 
-                               value= f"{fila["Valor final"]:,.2f} USD")   
+                               value= f"{simulació["Valor final"]:,.2f} USD")   
 
               
                
-     #Divisor
+     # Es crea un divisor per separar les diferents seccions
      st.divider()
 
-     # A la tuala de simualcions_guardades creo una nova columna on  afegeixo l'estratègia, la empresa, el capital inicial, i el període de temps
-     taula_simulacions_guardades["Nom"] = (taula_simulacions_guardades["Estratègia"]+ " - "+ taula_simulacions_guardades["Empresa"]+" - "+taula_simulacions_guardades["Capital inicial"].astype(str)
-                                           +" - "+ taula_simulacions_guardades["Data inici"].astype(str)+" | "+taula_simulacions_guardades["Data final"].astype(str))#ha de anar així perque sino spython no pot fer que isgui tot text i allo numeor) #ha de anar amb perèntesis
-                                           # https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.astype.html
-
-     # Converteixo la columna nova de "Nom" en una llista
-     noms = taula_simulacions_guardades["Nom"].tolist()
-     # https://pandas.pydata.org/docs/reference/api/pandas.Series.to_list.html
-
-     # Aqui creo una escala de colors per després reconèixer els colors dels gràfics
-     escala_colors = alt.Scale(
-     # https://altair-viz.github.io/user_guide/generated/core/altair.Scale.html
-       domain=noms
-     )
-
-     # Columnes
-     o1,espacio=st.columns([0.65,2])
+     # ELIMINAR SIMULACIONS
+     # Es creen dues columnes per distribuir l'espai
+     columna_eliminar,columna_espai=st.columns([0.65,2])
      
-     # Ara creo una nova columna de eliminar la qual només mostrara la estratègia, l'empresa i  el valor final per a que sapigues quina simulacio vols eliminar
-     taula_simulacions_guardades["Eliminar"] = (taula_simulacions_guardades["Estratègia"]+ " - "+ taula_simulacions_guardades["Empresa"]+" - " +taula_simulacions_guardades["Valor final"].round(2).astype(str))+" USD"
+     # Es crea una nova columna amb informació simplificada per identificar la simulació que es vol eliminar
+     dades_simulacions_guardades["Eliminar"] = (dades_simulacions_guardades["Estratègia"]+ " - "+ dades_simulacions_guardades["Empresa"]+" - " +dades_simulacions_guardades["Valor final"].round(2).astype(str))+" USD"
      # https://www.w3schools.com/python/ref_func_round.asp
 
-     # A la primera colulmna
-     with o1:
+     # Es selecciona la primera columna
+     with columna_eliminar:
+
+          # Es mostra el títol de l'apartat d'eliminació
           st.markdown("##### Eliminar simulació")
 
-          # Creo una recuadre on et surten les diferents simulacions per si vols eliminar alguna
-          eliminar= st.selectbox(
+          # Es crea un selector amb les simulacions disponibles per eliminar
+          simulació_eliminar= st.selectbox(
           label="Eliminar",
-          options= taula_simulacions_guardades["Eliminar"],
+          options= dades_simulacions_guardades["Eliminar"],
           label_visibility="collapsed"
 
      ) 
 
-     # Després he de calcular quina posició en la llista de tuala_simualcion_guardades és la que es vol eliminar
-     posició_eliminar= taula_simulacions_guardades["Eliminar"].tolist().index(eliminar)#tolist() convierte la columna de pandas a una lsita normal porque sino no deja index pq sino pilla los diferentes elementos de las tres cosas i da error i asi lo hacemos una lsita que ahi si se puede: ["Apple", "Microsoft", "Nvidia"]
+     # Es busca la posició de la simulació seleccionada dins de la llista
+     índex_simulació_eliminar= dades_simulacions_guardades["Eliminar"].tolist().index(simulació_eliminar)
+     
                                                                  
-     # Creo un boto per confirmar que es vol elimianr aquella simulació
-     eliminar_aceptar= st.button(
+     # Es crea un botó per confirmar l'eliminació de la simulació
+     boto_acceptar_eliminació= st.button(
      label="Acceptar"
      )
-     #Llinea
+
+     # Es crea un divisor per separar les seccions
      st.divider()
-     # Si es prem entra
-     if eliminar_aceptar== True:
-          # I elimina directament aquella simualció a traves de la seva posició
-          st.session_state.Simulacions_guardades.pop(posició_eliminar) #pop elimina
-          # I tornem a carregar tot per a que s'actualitzi
+
+    # Es comprova si s'ha premut el botó d'eliminació
+     if boto_acceptar_eliminació== True:
+
+          # S'elimina de la llista la simulació situada a la posició seleccionada
+          st.session_state.simulacions_guardades.pop(índex_simulació_eliminar)
+          # https://www.freecodecamp.org/espanol/news/funcion-pop-en-python/ 
+
+          # Es reinicia l'aplicació per actualitzar la informació mostrada
           st.rerun() #actualitzar la taula
 
-     # Creo una nova taula per fer el gràfic agafant només les variables de la columna nom i valor final
-     taula_grafic_valor_final = taula_simulacions_guardades[["Nom", "Valor final"]]
+
+
+     # PREPARAR DADES DELS GRÀFICS
+     # Es crea una nova columna que identifica cada simulació mitjançant l'estratègia, l'empresa, el capital inicial i el període
+     dades_simulacions_guardades["Nom"] = (dades_simulacions_guardades["Estratègia"]+ " - "+ dades_simulacions_guardades["Empresa"]+" - "+dades_simulacions_guardades["Capital inicial"].astype(str) # Amb astype s'indica que es treballa amb un número
+                                           +" - "+ dades_simulacions_guardades["Data inici"].astype(str)+" | "+dades_simulacions_guardades["Data final"].astype(str))
+                                           # https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.astype.html
+
+     # Es converteix la columna "Nom" en una llista
+     noms_simulacions = dades_simulacions_guardades["Nom"].tolist()
+     # https://pandas.pydata.org/docs/reference/api/pandas.Series.to_list.html
+
+     # Es crea una escala de colors per associar un color a cada simulació
+     escala_colors_simulacions = alt.Scale(
+     # https://altair-viz.github.io/user_guide/generated/core/altair.Scale.html
+       domain=noms_simulacions
+     )
+
+     # Es crea una taula amb el nom i el valor final de cada simulació per utilitzar aquestes dades en el gràfic corresponent
+     dades_grafic_valor_final = dades_simulacions_guardades[["Nom", "Valor final"]]
      # https://pandas.pydata.org/docs/getting_started/intro_tutorials/03_subset_data.html
 
 
-    # I creo el primer gràfic rodo només del valor final
-     grafico_valor_final = alt.Chart(taula_grafic_valor_final).mark_arc(outerRadius=130).encode(  #altair si detecta el mismo nombre... las junta
-         # El valor és el valor final
+     # Es crea un gràfic circular per comparar els valors finals de les simulacions
+     gràfic_valor_final = alt.Chart(dades_grafic_valor_final).mark_arc(outerRadius=130).encode(  
+         
+        # Es representa el valor final de cada simulació 
         theta="Valor final:Q",
 
-        # I el color utilizo la columna de escala de colors sense legenda
-        color=alt.Color("Nom:N",scale=escala_colors,legend=None)
+        # Es diferencia cada simulació mitjançant el seu color i s'oculta la llegenda
+        color=alt.Color("Nom:N",scale=escala_colors_simulacions,legend=None)
+
      # https://altair-viz.github.io/altair-viz-v4/user_guide/encoding.html
      # https://altair-viz.github.io/user_guide/marks/arc.html
+
      ).properties(height=350)
 
 
-     # Creo una nova taula per fer el gràfic agafant només les variables de la columna nom i el benefici
-     taula_grafic_benefici = taula_simulacions_guardades[["Nom","Benefici"]]
+     # Es crea una taula amb el nom i el benefici de cada simulació per utilitzar aquestes dades en el gràfic corresponent
+     dades_grafic_benefici = dades_simulacions_guardades[["Nom","Benefici"]]
 
-     # I creo el primer gràfic barres només del valor final
-     grafico_beneficio= alt.Chart(taula_grafic_benefici).mark_bar(width=40).encode(
-         # El valor és el benefici a l'eix y
+
+     # Es crea un gràfic de barres per comparar el benefici de les simulacions
+     gràfic_benefici= alt.Chart(dades_grafic_benefici).mark_bar(width=40).encode(
+         # Es representa el benefici a l'eix vertical
+
          y=alt.Y("Benefici:Q",title=None),
-         # Amb relació amb el nom
+
+         # Es relaciona cada barra amb el nom de la simulació
          x=alt.X("Nom:N",axis=None, #axis en relaida es para lo de vertical o horizontal
          # https://altair-viz.github.io/user_guide/customization.html
 
+         # Es configura l'eix del gràfic
          scale= alt.Scale(padding=10)),
 
-          # I el color utilizo la columna de escala de colors sense legenda
-         color=alt.Color("Nom:N",scale=escala_colors,legend=None))
+         # Es diferencia cada simulació mitjançant el seu color i s'oculta la llegenda
+         color=alt.Color("Nom:N",scale=escala_colors_simulacions,legend=None))
 
-      # Creo una nova taula per fer el gràfic agafant només les variables de la columna nom i la rendibiliata
-     taula_grafic_rendibilitat= taula_simulacions_guardades[["Nom","Rendibilitat"]]
+     # Es crea una taula amb el nom i la rendibilitat de cada simulació per utilitzar aquestes dades en el gràfic corresponent
+     
 
+     # Es crea una taula amb el nom i la volatilitat de cada simulació per utilitzar aquestes dades en el gràfic corresponent
+     dades_grafic_volatilitat = dades_simulacions_guardades[
+     ["Nom", "Volatilitat"]
+          ]
 
-     # Cre tres llistes per després crear els gràfics
-     # Una dels noms
-     noms_evolució=[]
-     # Una altre de les dates i la seva evolució
-     dates_evolució=[]
-     # I l'ultima del capital i la seva evouclió
-     capital_evolució=[]
+     # Es crea un gràfic de barres per comparar la volatilitat
+     gràfic_volatilitat = alt.Chart(
+     dades_grafic_volatilitat
+     ).mark_bar(width=43).encode(
 
-     # Aqui li dic que vagi recorrent filera per filera per obtenir tota l'evolució dels capitals que es va guarda previament
-     for numero,fila_1 in taula_simulacions_guardades.iterrows():
+     # Es representa la volatilitat a l'eix vertical
+     y=alt.Y("Volatilitat:Q",title=None),
 
-         
-         for i in range(len(fila_1["Evolució capital"])):# evolucio capital porque tiene todos los datos
+     # Es representa cada simulació a l'eix horitzontal
+     x=alt.X("Nom:N",axis=None,scale=alt.Scale(padding=10)),
 
-             # I guardo el nom a la llista de noms
-             noms_evolució.append(fila_1["Nom"])
-
-             # Les dates a la llista de evolució de dates
-             dates_evolució.append(fila_1["Evolució dates"][i])
-
-             # I el capital a la llista de l'evolució del capital
-             capital_evolució.append(fila_1["Evolució capital"][i])
+     # Es diferencia cada simulació mitjançant el seu color
+     color=alt.Color("Nom:N",scale=escala_colors_simulacions,legend=None)
+     ).properties(height=355)
 
 
-     #Ara que le tres llistes ja estan plenes les ajunto totes tres amb zip
-     ajuntar_dades= zip(noms_evolució,dates_evolució,capital_evolució)
+     
+     # Es crea una taula amb el nom i el Sharpe de cada simulació per utilitzar aquestes dades en el gràfic corresponent
+     dades_grafic_sharpe = dades_simulacions_guardades[
+          ["Nom", "Sharpe"]]
 
-     # I hi creo una taula amb el Nom, la data i el capital
-     taula_grafic_evolució=pd.DataFrame(
-         ajuntar_dades,
+     # Es crea un gràfic de barres per comparar el Sharpe
+     gràfic_sharpe = alt.Chart(
+     dades_grafic_sharpe
+     ).mark_bar(width=43).encode(
+
+     # Es representa el Sharpe a l'eix vertical
+     y=alt.Y("Sharpe:Q",title=None),
+
+     # Es representa cada simulació a l'eix horitzontal
+     x=alt.X("Nom:N",axis=None,scale=alt.Scale(padding=10)
+     ),
+
+     # Es diferencia cada simulació mitjançant el seu color
+     color=alt.Color("Nom:N",scale=escala_colors_simulacions,legend=None)
+     ).properties(height=350)
+
+     
+     # Es creen tres llistes per preparar les dades del gràfic d'evolució
+     # Es crea una llista per emmagatzemar els noms de les simulacions
+     noms_evolució_simulacions=[]
+     # Es crea una llista per emmagatzemar les dates
+     dates_evolució_simulacions=[]
+     # Es crea una llista per emmagatzemar els valors de capital
+     capital_evolució_simulacions=[]
+
+    # Es recorren totes les simulacions guardades per obtenir-ne l'evolució del capital
+     for index_simulació,simulació in dades_simulacions_guardades.iterrows():
+
+         # Es recorren tots els valors de l'evolució del capital de la simulació actual
+         for i in range(len(simulació["Evolució capital"])):# evolucio capital porque tiene todos los datos
+
+             # S'afegeix el nom de la simulació a la llista corresponent
+             noms_evolució_simulacions.append(simulació["Nom"])
+
+             # S'afegeix la data corresponent a la llista d'evolució
+             dates_evolució_simulacions.append(simulació["Evolució dates"][i])
+
+             # S'afegeix el valor del capital corresponent a la llista d'evolució
+             capital_evolució_simulacions.append(simulació["Evolució capital"][i])
+
+
+     # Es combinen les tres llistes en una única estructura mitjançant zip
+     dades_evolució= zip(noms_evolució_simulacions,dates_evolució_simulacions,capital_evolució_simulacions)
+
+     # Es crea un DataFrame amb el nom, la data i el capital de cada simulació
+     dades_grafic_evolució=pd.DataFrame(
+         dades_evolució,
          columns=["Nom","Dates","Capital"]
      ) 
 
-
-     
-     
-
-     # Seguidament represento el gràfic lineal de cada simualció per a que es vegi la comparació
-     grafico_evolució= alt.Chart(taula_grafic_evolució).mark_line().encode(
+     # Es crea un gràfic lineal per representar l'evolució del capital de cada simulació
+     gràfic_evolució= alt.Chart(dades_grafic_evolució).mark_line().encode(
+         # Es representen les dates a l'eix horitzontal
          x="Dates:T",
-         y="Capital:Q", #no admet cap espai
-         color=alt.Color("Nom:N",scale=escala_colors,legend=None)
+
+         # Es representen els valors del capital a l'eix vertical
+         y="Capital:Q", 
+
+         # Es diferencia cada simulació mitjançant el seu color
+         color=alt.Color("Nom:N",scale=escala_colors_simulacions,legend=None)
      )
 
-     # 
-     grafico_evolució=(grafico_evolució).properties(
+     # Es defineix l'altura del gràfic d'evolució
+     gràfic_evolució=(gràfic_evolució).properties(
          height=500
      )
 
 
-     
-
-     
-
-     # Creo una condició per a que  st.session_state.Comparar comenci falsa
+     # COMPARAR SIMULACIONS
+     # Es comprova si existeix l'estat "Comparar" si no existeix, es crea amb valor inicial False
      if "Comparar" not in st.session_state:
           st.session_state.Comparar = False
 
-     # I un boto de comparar la simualció
-     comparar_boto= st.button(
+     # Es crea el botó per iniciar la comparació de les simulacions
+     boto_comparar= st.button(
           label="Comparar"
      )
 
-     # Si es prem el boto  st.session_state.Comparar es tornara True
-     if comparar_boto==True:
+     # Es comprova si s'ha premut el botó de comparació
+     if boto_comparar==True:
           st.session_state.Comparar=True
 
-     # Si  st.session_state.Comparar es torna true entra en aqusta condició
+     # Es comprova si la comparació està activa
      if st.session_state.Comparar ==True:
 
-          # I creo una fórmula per calcular depenent el númeor de simulacion l'espai que es necessitarà
-          altura_leyenda = ((len(taula_simulacions_guardades) + 1) // 2) * 70
 
-          #Mirar pq abans no funcionaba = error
-          taula_leyenda = taula_simulacions_guardades[["Nom"]]
+          # MOSTRAR LLEGENDA
+          # Es calcula l'altura necessària per mostrar la llegenda en funció del nombre de simulacions guardades
+          altura_llegenda = ((len(dades_simulacions_guardades) + 1) // 2) * 80
 
-          #I creo el gràfic per a que cada elemnt que hi hagi a la columna de Nom es representi amb el seu color i un punt al principi
-          leyenda = alt.Chart(taula_leyenda).mark_point(
-      opacity=0).encode(color=alt.Color( "Nom:N",scale=escala_colors,legend=alt.Legend(orient="top",columns=1,labelLimit=2000,title=None,labelFontSize=20))).properties(
-      height=altura_leyenda)
-     # https://altair-viz.github.io/user_guide/marks/point.html
+          # Es crea una taula que conté únicament els noms de les simulacions
+          dades_llegenda = dades_simulacions_guardades[["Nom"]]
 
-          # Subtitol
+          # Es crea un gràfic de punts transparent per generar la llegenda amb un color diferent per a cada simulació
+          llegenda = alt.Chart(dades_llegenda).mark_point(
+          opacity=0).encode(color=alt.Color( "Nom:N",scale=escala_colors_simulacions,legend=alt.Legend(orient="top",columns=1,labelLimit=2000,title=None,labelFontSize=20))).properties(
+          height=altura_llegenda)
+           # https://altair-viz.github.io/user_guide/marks/point.html
+
+          # Es mostra el subtítol de la llegenda
           st.subheader("Llegenda")
 
-          # I el represento
-          st.altair_chart(leyenda)
+          # Es mostra la llegenda creada
+          st.altair_chart(llegenda)
 
-          # Creo diferents caselles per representar el gràfic i la taula
+
+          # MOSTRAR GRÀFIC I TAULA
+          # Es creen dues pestanyes per separar el gràfic i la taula
           tab_grafic, tab_taula = st.tabs(["Gràfic"," Taula" ])
           # https://docs.streamlit.io/develop/api-reference/layout/st.tabs
                
 
-          # Si la casella es te tab_grafic
+          # Es selecciona la pestanya del gràfic
           with tab_grafic:
 
-               # Es representara el gràfic
-               st.altair_chart(grafico_evolució,use_container_width=True# ocupa el maxim de amplada possible, ns si cal de veirta
+               # Es mostra el gràfic amb l'evolució del capital
+               st.altair_chart(gràfic_evolució,use_container_width=True# ocupa el maxim de amplada possible, ns si cal de veirta
           )
 
-          # En canvi si la casella es de tab_taula
+          # Es selecciona la pestanya de la taula
           with tab_taula:
 
-               
-               taula_simulacions_guardades_noves = taula_simulacions_guardades.drop(columns=["Nom","Evolució capital","Evolució dates","Eliminar"] )# poniendo clums no hace falta axis=1
+               # Es crea una còpia de la taula eliminant les columnes que no són necessàries per a la visualització
+               dades_simulacions_visualització = dades_simulacions_guardades.drop(columns=["Nom","Evolució capital","Evolució dates","Eliminar"] )# poniendo clums no hace falta axis=1
 
-               # Es representara la taula amb totes les dades sense les columnes inecessaries
-               st.dataframe(taula_simulacions_guardades_noves,hide_index=True # hide_index no es pot fer ma st.write
+               # Es mostra la taula amb les dades de les simulacions i s'oculta l'índex
+               st.dataframe(dades_simulacions_visualització,hide_index=True # hide_index no es pot fer ma st.write
                )
 
 
-          
-         
 
-          # Llinea
+          # GRÀFICS DE GUANYS
+          # Es crea un divisor per separar les seccions
           st.divider()
-          # Subtitol
+
+          # Es mostra el títol de l'apartat de guanys
           st.subheader("GUANYS")
 
 
-          # Creo dues columnes per mostrar el valor final
-          v1, v2 = st.columns([1, 1])
+          # Es creen dues columnes per distribuir els gràfics dels guanys
+          col1, col2 = st.columns([1, 1])
 
-          with v1:
-           a1,a2=st.columns([7,0.2])
+          # Es selecciona la primera columna
+          with col1:
 
-           with a1:
-            
-           
-              
+           # Es creen deus altres columnes
+           col3,col4=st.columns([7,0.2])
 
-            # I a la ensenyo el gràfic
+           # Es selecciona la tercera columna
+           with col3:
+
+           # Es mostra el gràfic del valor final dins d'un contenidor amb una vora
             with st.container(border=True):
                st.subheader("Valor final")
                st.altair_chart(
-                    grafico_valor_final,
+                    gràfic_valor_final,
                     use_container_width=True
                )
 
-          # Seguidament creo altres dos columnes per representar el benefici
-          with v2:
-           b1, b2 = st.columns([7, 0.1])
+          # Es selecciona la quarta columna
+          with col4:
 
-           with b1:
+           # Es creen dues altres columnes
+           col5, col6 = st.columns([7, 0.1])
+
+           # Es selecciona la cinquena columna
+           with col5:
             
-           
-          
-              
-
-            #I el g`rafic del benefici`
+            # Es mostra el gràfic del benefici dins d'un contenidor amb una vora
              with st.container(border=True):
                               st.subheader("Benefici")
                               st.altair_chart(
-                                   grafico_beneficio,
+                                   gràfic_benefici,
                                    use_container_width=True
                               )
-                              
-
-          
-     
-
-          # I agafo nomes la columna de nom i volatitilitat pel seu gràfic
-          taula_grafic_volatilitat = taula_simulacions_guardades[
-          ["Nom", "Volatilitat"]
-               ]
-
-          #I creo el gràfic de volatilita
-          grafico_volatilitat = alt.Chart(
-          taula_grafic_volatilitat
-          ).mark_bar(width=43).encode(
-          y=alt.Y("Volatilitat:Q",title=None),
-          x=alt.X("Nom:N",axis=None,scale=alt.Scale(padding=10)),
-          color=alt.Color("Nom:N",scale=escala_colors,legend=None)
-          ).properties(height=355)
+                         
 
 
-          
-
-          # I agafo nomes la columna de nom i sharpe pel seu gràfic
-          taula_grafic_sharpe = taula_simulacions_guardades[
-               ["Nom", "Sharpe"]]
-
-          #I creo el gràfic de Sharpe
-          grafico_sharpe = alt.Chart(
-          taula_grafic_sharpe
-          ).mark_bar(width=43).encode(
-          y=alt.Y("Sharpe:Q",title=None),
-          x=alt.X("Nom:N",axis=None,scale=alt.Scale(padding=10)
-          ),
-          color=alt.Color("Nom:N",scale=escala_colors,legend=None)
-          ).properties(height=350)
-
-          #Llinea
+          # GRÀFICS DE RISC
+          # Es crea un divisor per separar les seccions
           st.divider()
-          # Subtitol
+
+          # Es mostra el títol de l'apartat de risc
           st.subheader("RISC")
           
 
-          # Creo dues columens per representar la volatilitat
-          r1, r2 = st.columns([1, 1])
+          # Es creen dues columnes per distribuir els gràfics de risc
+          col1, col2 = st.columns([1, 1])
 
-          # A la primera columna
-          with r1:
+          # Es selecciona la primera columna
+          with col1:
            
-         # A la primera columna represento el gràfic de Sharpe
+                # Es mostra el gràfic del Sharpe dins d'un contenidor amb una vora
                with st.container(border=True):
                 st.subheader("Sharpe")
 
                 st.altair_chart(
-                    grafico_sharpe,
+                    gràfic_sharpe,
                     use_container_width=True
                )
-          #I a la segona columna 
+          
      
+          # Es selecciona la segona columna
+          with col2:
 
-          # A la segona columna represento el gràfic de la volatitlita
-          with r2:
-           
+            # Es mostra el gràfic de la volatilitat dins d'un contenidor amb una vora
             with st.container(border=True):
                st.subheader("Volatilitat")
 
                st.altair_chart(
-                    grafico_volatilitat,
+                    gràfic_volatilitat,
                     use_container_width=True
                )
 
 
-          
-
+# AVÍS DE SIMULACIONS INSUFICIENTS
 # En el cas que no hi hagin simulaicons guardadas, t'avisar
 else: 
       st.markdown("#### Per fer servir l'espai de comparació de simulacions primer ha de guardar com a mínim dos simulacions.")

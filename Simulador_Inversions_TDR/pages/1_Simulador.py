@@ -1847,9 +1847,7 @@ if st.session_state.simulació_realitzada==True:
                         # Es crea un diccionari per associar cada empresa amb la seva evolució de capital
                         dades_gràfic_empreses_individual={} 
 
-                        # Es crea una llista per emmagatzemar el nombre d'accions comprades de cada empresa
-                        accions_totals_comprades=[]              
-
+                       
                         # Es recorren les dades corresponents a cada empresa, al capital destinat i al seu període           
                         for empresa,diners_distribució,dades_simulació in dades_accions_empreses:  
 
@@ -1871,9 +1869,6 @@ if st.session_state.simulació_realitzada==True:
                                 
                                 # S'afegeix el nom de l'empresa a la llista corresponent
                                 noms_empreses.append(empresa)
-
-                                # S'afegeix el nombre d'accions comprades a la llista corresponent
-                                accions_totals_comprades.append(accions_comprades)
 
                                 # Es crea una llista per emmagatzemar els valors diaris de cada empresa
                                 valors_de_cada_empresa=[]
@@ -2021,12 +2016,6 @@ if st.session_state.simulació_realitzada==True:
 
                                         # S'indica que es treballa amb la primera columna
                                         with col1: 
-
-                                            # Es calcula el nombre total d'accions comprades sumant les accions de totes les empreses
-                                            accions_totals_suma=sum(accions_totals_comprades)
-
-                                            # Es mostra el nombre total d'accions comprades
-                                            st.write(f"Nombre d'accions comprades: {accions_totals_suma:,.2f}")
 
                                             # Es mostra la rendibilitat obtinguda durant la simulació
                                             st.write(f"Rendibilitat : {rentabilitat:,.2f} %") 

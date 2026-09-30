@@ -1729,7 +1729,7 @@ if st.session_state.simulació_realitzada==True:
                 with col3:
 
                     # Es mostra el selector del percentatge de capital destinat a l'empresa
-                    percentatges_seleccionats=st.slider(
+                    percentatges_seleccionat=st.slider(
                             label=f"Tria el percentatge de l'empresa {i+1}",
                             min_value=1,
                             max_value=99,
@@ -1741,7 +1741,7 @@ if st.session_state.simulació_realitzada==True:
                     )
 
                     # Es calcula la quantitat de capital destinada a l'empresa seleccionada
-                    mostrar_percentatge= capital_inicial*percentatges_seleccionats/100
+                    mostrar_percentatge= capital_inicial*percentatges_seleccionat/100
 
                     # Es mostra el capital destinat a l'empresa
                     st.write(f"Capital inicial: {mostrar_percentatge:.0f} USD")
@@ -1754,7 +1754,7 @@ if st.session_state.simulació_realitzada==True:
             empreses_seleccionades.append(empresa_seleccionar)
 
             # S'afegeix el percentatge seleccionat a la llista corresponent
-            percentatges_seleccionats.append(percentatges_seleccionats)
+            percentatges_seleccionats.append(percentatges_seleccionat)
 
         # Es comprova si hi ha empreses repetides en la selecció
         if len(empreses_seleccionades) != len(set(empreses_seleccionades)):
@@ -1807,7 +1807,7 @@ if st.session_state.simulació_realitzada==True:
                     for dades in guardar_dades[1:]:
                         # https://www.askpython.com/python/list/x-in-a1-mean-python
 
-                        # Es recorren les dades de les empreses restants
+                        # Es sincronitzen el totes les dades de cada empresa
                         dates_comunes_empreses = dates_comunes_empreses.intersection(dades.index)
                         # https://www.w3schools.com/python/ref_set_intersection.asp
 
@@ -1830,311 +1830,311 @@ if st.session_state.simulació_realitzada==True:
 
                     # A partir d'aquí continua la simulació
 
-                    # Es combinen les empreses, el capital destinat i les seves dades mitjançant zip
-                    dades_accions_empreses= zip(empreses_seleccionades,distribució_capital,guardar_dades)
-                    # https://www.geeksforgeeks.org/python/zip-in-python/ 
+                        # Es combinen les empreses, el capital destinat i les seves dades mitjançant zip
+                        dades_accions_empreses= zip(empreses_seleccionades,distribució_capital,guardar_dades)
+                        # https://www.geeksforgeeks.org/python/zip-in-python/ 
 
 
-                    # Es crea una llista per emmagatzemar els valors de totes les empreses
-                    empreses_seleccionades=[]
+                        # Es crea una llista per emmagatzemar els valors de totes les empreses
+                        empreses_seleccionades=[]
 
-                    # Es crea una llista per emmagatzemar els noms de les empreses       
-                    noms_empreses=[]
-                
-                    # Es crea una llista per emmagatzemar el valor final de cada empresa
-                    valor_final_empresa =[]
+                        # Es crea una llista per emmagatzemar els noms de les empreses       
+                        noms_empreses=[]
+                    
+                        # Es crea una llista per emmagatzemar el valor final de cada empresa
+                        valor_final_empresa =[]
 
-                    # Es crea un diccionari per associar cada empresa amb la seva evolució de capital
-                    dades_gràfic_empreses_individual={} 
+                        # Es crea un diccionari per associar cada empresa amb la seva evolució de capital
+                        dades_gràfic_empreses_individual={} 
 
-                    # Es crea una llista per emmagatzemar el nombre d'accions comprades de cada empresa
-                    accions_totals_comprades=[]              
+                        # Es crea una llista per emmagatzemar el nombre d'accions comprades de cada empresa
+                        accions_totals_comprades=[]              
 
-                    # Es recorren les dades corresponents a cada empresa, al capital destinat i al seu període           
-                    for empresa,diners_distribució,dades_simulació in dades_accions_empreses:  
+                        # Es recorren les dades corresponents a cada empresa, al capital destinat i al seu període           
+                        for empresa,diners_distribució,dades_simulació in dades_accions_empreses:  
 
-                            # S'obté el preu d'obertura del primer dia de la simulació
-                            preu_obertura= dades_simulació["Open"].iloc[0]
+                                # S'obté el preu d'obertura del primer dia de la simulació
+                                preu_obertura= dades_simulació["Open"].iloc[0]
 
-                            # Es calcula el nombre d'accions que es poden comprar amb el capital destina
-                            accions_comprades= diners_distribució/preu_obertura
-
-
-                            # S'obté el preu de tancament de l'últim dia de la simulació
-                            preu_tancament = dades_simulació["Close"].iloc[-1]
-
-                            # Es calcula el valor final de cada empresa
-                            valor_final_empresa= preu_tancament*accions_comprades
-
-                            # S'afegeix el valor final de l'empresa a la llista corresponent
-                            valor_final_empresa.append(valor_final_empresa)
-                            
-                             # S'afegeix el nom de l'empresa a la llista corresponent
-                            noms_empreses.append(empresa)
-
-                            # S'afegeix el nombre d'accions comprades a la llista corresponent
-                            accions_totals_comprades.append(accions_comprades)
-
-                            # Es crea una llista per emmagatzemar els valors diaris de cada empresa
-                            valors_de_cada_empresa=[]
-
-                                                                
-                            # Es recorren totes les dates disponibles de l'empresa
-                            for dates_DIS_act in dades_simulació.index:
-                                    
-                                    # S'obté el preu de tancament corresponent a cada dia
-                                    preu_tancament_dia=dades_simulació.loc[dates_DIS_act,"Close"]
-
-                                    # Es calcula el valor de les accions de l'empresa en cada dia
-                                    valor_inversió_dia=accions_comprades*preu_tancament_dia #las acciones no canvian, canvia su precio. EX:10 acciones, precio dia 2: 1100, 10 *110$, dia 3: 900, 10*90$
-
-                                    # S'afegeix el valor diari a la llista corresponent
-                                    valors_de_cada_empresa.append(valor_inversió_dia) # valors_de_cada_empresa ↓ [6000, 6050, 5900, 6100]
+                                # Es calcula el nombre d'accions que es poden comprar amb el capital destina
+                                accions_comprades= diners_distribució/preu_obertura
 
 
-                            # S'afegeixen els valors de l'empresa a la llista que conté totes les empreses   
-                            empreses_seleccionades.append(valors_de_cada_empresa) 
+                                # S'obté el preu de tancament de l'últim dia de la simulació
+                                preu_tancament = dades_simulació["Close"].iloc[-1]
 
-                            # S'associa cada empresa amb la seva evolució de capital dins del diccionari
-                            dades_gràfic_empreses_individual[empresa]=valors_de_cada_empresa # aqui ponemos empresa porque asi cada vuelta detecta en que empresa esta en esa vuelta, si pusiera "APPLE" estaria mal
-                            
+                                # Es calcula el valor final de cada empresa
+                                valor_final= preu_tancament*accions_comprades
 
-                    # Es crea un DataFrame amb l'evolució individual de cada empresa
-                    taula_de_cada_empresa_individual=pd.DataFrame( # No cal un diccionari perque ja tinc els nombs de les columnes
-                    dades_gràfic_empreses_individual)
-
-                    # Es crea una columna amb les dates comunes corresponents als valors de cada empresa
-                    taula_de_cada_empresa_individual["Dates"]= dates_comunes_empreses 
-                            
-
-
-                    # Ara que ja tinc tots els valors de cada empresa els he de sumar per a crear un únic gràfic amb tots els valors
-                    #Primer creo la llista
-                    capital_total_invertit=[]
-
-                    # Es recorren totes les posicions temporals de les dades 
-                    for i in range(len(empreses_seleccionades[0])):#range no pot ser una lista
-                    # https://docs.python.org/es/3.7/tutorial/introduction.html
-
-                                        # Es defineix el capital del dia actual inicialment com a 0
-                                        capital_invertit_dia=0
-
-                                        # Es recorren les dades de totes les empreses per sumar-ne el valor
-                                        for empresa in empreses_seleccionades:
-
-                                            # S'afegeix el valor de cada empresa corresponent al dia actual
-                                            capital_invertit_dia= capital_invertit_dia+ empresa[i] # [2000, 2000, 2200], valor de esta empresa en este dia
-
-                                        # S'afegeix el capital total del dia a la llista corresponent   
-                                        capital_total_invertit.append(capital_invertit_dia)# tiene que estar fuera porque queremos guardar una solo suma por dia, no una suma por cada empresa
-                            
+                                # S'afegeix el valor final de l'empresa a la llista corresponent
+                                valor_final_empresa.append(valor_final)
                                 
-                    # Es crea un DataFrame amb l'evolució del capital total i les dates 
-                    dades_diversificació = pd.DataFrame({
-                                        "Capital":capital_total_invertit,
-                                        "Data":dates_comunes_empreses
-                                })
+                                # S'afegeix el nom de l'empresa a la llista corresponent
+                                noms_empreses.append(empresa)
 
-                    # CÀLCULS DE DIVERSIFICACIÓ
-                    # Es calcula el valor final de la cartera
-                    valor_final= capital_total_invertit[-1]
+                                # S'afegeix el nombre d'accions comprades a la llista corresponent
+                                accions_totals_comprades.append(accions_comprades)
 
-                    # Es calcula el benefici restant el capital inicial al valor final
-                    benefici_inversió= valor_final-capital_inicial
+                                # Es crea una llista per emmagatzemar els valors diaris de cada empresa
+                                valors_de_cada_empresa=[]
 
-                    # Es calcula la rendibilitat de la inversió en percentatge
-                    rentabilitat= (valor_final-capital_inicial)/capital_inicial*100
+                                                                    
+                                # Es recorren totes les dates disponibles de l'empresa
+                                for dates_DIS_act in dades_simulació.index:
+                                        
+                                        # S'obté el preu de tancament corresponent a cada dia
+                                        preu_tancament_dia=dades_simulació.loc[dates_DIS_act,"Close"]
 
-                    # Es calcula el màxim acumulat del capital total
-                    màxims_acumulats=pd.Series(capital_total_invertit).cummax()
+                                        # Es calcula el valor de les accions de l'empresa en cada dia
+                                        valor_inversió_dia=accions_comprades*preu_tancament_dia #las acciones no canvian, canvia su precio. EX:10 acciones, precio dia 2: 1100, 10 *110$, dia 3: 900, 10*90$
 
-                    # Es calcula el Drawdown comparant cada valor amb el màxim acumulat corresponent
-                    drawdown=((pd.Series(capital_total_invertit)/(màxims_acumulats))-1)*100
+                                        # S'afegeix el valor diari a la llista corresponent
+                                        valors_de_cada_empresa.append(valor_inversió_dia) # valors_de_cada_empresa ↓ [6000, 6050, 5900, 6100]
 
-                    # S'obté la caiguda percentual més gran registrada durant la simulació   
-                    drawdown_màxim=drawdown.min()
 
-                    # Es calcula el canvi percentual entre els valors consecutius del capital total
-                    rendiments_diàris = pd.Series(capital_total_invertit).pct_change().dropna()
+                                # S'afegeixen els valors de l'empresa a la llista que conté totes les empreses   
+                                empreses_seleccionades.append(valors_de_cada_empresa) 
 
-                    # S'estableix la taxa sense risc en 0 per al càlcul del Sharpe                                               
-                    taxa_sense_risc = 0
+                                # S'associa cada empresa amb la seva evolució de capital dins del diccionari
+                                dades_gràfic_empreses_individual[empresa]=valors_de_cada_empresa # aqui ponemos empresa porque asi cada vuelta detecta en que empresa esta en esa vuelta, si pusiera "APPLE" estaria mal
+                                
 
-                    # Es calcula el Sharpe a partir de la mitjana i la desviació estàndard dels rendiments   
-                    ràtio_sharpe = (rendiments_diàris.mean() - taxa_sense_risc) / rendiments_diàris.std() * (252 ** 0.5)
+                        # Es crea un DataFrame amb l'evolució individual de cada empresa
+                        taula_de_cada_empresa_individual=pd.DataFrame( # No cal un diccionari perque ja tinc els nombs de les columnes
+                        dades_gràfic_empreses_individual)
 
-                    # Es calcula la volatilitat anualitzada a partir de la desviació estàndard dels rendiments
-                    volatilitat_anualitzada = rendiments_diàris.std() * (252 ** 0.5) * 100            
+                        # Es crea una columna amb les dates comunes corresponents als valors de cada empresa
+                        taula_de_cada_empresa_individual["Dates"]= dates_comunes_empreses 
+                                
 
-                    # RESULTATS DE LA SIMULACIÓ STOP-LOSS I TAKE-PROFIT
-                    # Es crea el botó per iniciar la simulació
-                    boto_començar= st.button(
-                        label="Començar simulació",
 
-                        # Es defineix una clau única per identificar el botó dins de Streamlit
-                        key="boto_diversificació"
-                )
+                        # Ara que ja tinc tots els valors de cada empresa els he de sumar per a crear un únic gràfic amb tots els valors
+                        #Primer creo la llista
+                        capital_total_invertit=[]
 
-                    # Es comprova si s'ha premut el botó d'inici de la simulació
-                    if boto_començar==True:
-                        st.session_state.boto_començar=True
+                        # Es recorren totes les posicions temporals de les dades 
+                        for i in range(len(empreses_seleccionades[0])):#range no pot ser una lista
+                        # https://docs.python.org/es/3.7/tutorial/introduction.html
 
-                    # Es comprova si la simulació està activa
-                    if st.session_state.boto_començar== True:
+                                            # Es defineix el capital del dia actual inicialment com a 0
+                                            capital_invertit_dia=0
 
-                                    # Es separen visualment les diferents etapes de la simulació
-                                    st.divider()
+                                            # Es recorren les dades de totes les empreses per sumar-ne el valor
+                                            for empresa in empreses_seleccionades:
 
-                                    # Es mostra el títol corresponent a la segona etapa
-                                    st.subheader("Etapa 2")
+                                                # S'afegeix el valor de cada empresa corresponent al dia actual
+                                                capital_invertit_dia= capital_invertit_dia+ empresa[i] # [2000, 2000, 2200], valor de esta empresa en este dia
 
-                                    # Es mostra el títol del gràfic de l'evolució del capital total
-                                    st.subheader("Gràfic total")
-
-                                    # GRÀFIC DEL CAPITAL DE DIVERSIFICACIÓ
-                                    # Es crea el gràfic amb l'evolució del capital total de la cartera
-                                    st.altair_chart(alt.Chart(dades_diversificació).mark_line().encode(
-
-                                        # S'utilitza la data com a eix horitzontal  
-                                        x="Data:T",
-
-                                        # S'utilitza el capital total com a eix vertical
-                                        y="Capital:Q"
-                                    ).properties(height=600))
-
+                                            # S'afegeix el capital total del dia a la llista corresponent   
+                                            capital_total_invertit.append(capital_invertit_dia)# tiene que estar fuera porque queremos guardar una solo suma por dia, no una suma por cada empresa
+                                
                                     
-                                    
-                                    # Es mostra el subtítol corresponent als detalls de la inversió
-                                    st.subheader("Detalls de la inversió")
+                        # Es crea un DataFrame amb l'evolució del capital total i les dates 
+                        dades_diversificació = pd.DataFrame({
+                                            "Capital":capital_total_invertit,
+                                            "Data":dates_comunes_empreses
+                                    })
 
-                                    # Es crea una estructura de columnes per distribuir els resultats
-                                    # Les columnes addicionals s'utilitzen com a espai de separació
-                                    col_resultats,col3,col4,col5 = st.columns([5,1,1,1])
+                        # CÀLCULS DE DIVERSIFICACIÓ
+                        # Es calcula el valor final de la cartera
+                        valor_final= capital_total_invertit[-1]
 
-                                    # Es crea un contenidor amb una vora per agrupar els resultats
-                                    # El contenidor principal es divideix en dues columnes
-                                    with col_resultats:
-                                        with st.container(border=True):
+                        # Es calcula el benefici restant el capital inicial al valor final
+                        benefici_inversió= valor_final-capital_inicial
 
-                                            # Es creen dos columnes noves
-                                            col1,col2=st.columns(2)
+                        # Es calcula la rendibilitat de la inversió en percentatge
+                        rentabilitat= (valor_final-capital_inicial)/capital_inicial*100
 
-                                    # S'indica que es treballa amb la primera columna
-                                    with col1: 
+                        # Es calcula el màxim acumulat del capital total
+                        màxims_acumulats=pd.Series(capital_total_invertit).cummax()
 
-                                        # Es calcula el nombre total d'accions comprades sumant les accions de totes les empreses
-                                        accions_totals_suma=sum(accions_totals_comprades)
+                        # Es calcula el Drawdown comparant cada valor amb el màxim acumulat corresponent
+                        drawdown=((pd.Series(capital_total_invertit)/(màxims_acumulats))-1)*100
 
-                                        # Es mostra el nombre total d'accions comprades
-                                        st.write(f"Nombre d'accions comprades: {accions_totals_suma:,.2f}")
+                        # S'obté la caiguda percentual més gran registrada durant la simulació   
+                        drawdown_màxim=drawdown.min()
 
-                                        # Es mostra la rendibilitat obtinguda durant la simulació
-                                        st.write(f"Rendibilitat : {rentabilitat:,.2f} %") 
+                        # Es calcula el canvi percentual entre els valors consecutius del capital total
+                        rendiments_diàris = pd.Series(capital_total_invertit).pct_change().dropna()
 
-                                        # Es mostra el màxim Drawdown obtingut
-                                        st.write(f"Màxim Drawdown: {drawdown_màxim:,.2f} %")
+                        # S'estableix la taxa sense risc en 0 per al càlcul del Sharpe                                               
+                        taxa_sense_risc = 0
 
-                                        # Es mostra la volatilitat anualitzada obtinguda
-                                        st.write(f"Volatilitat: {volatilitat_anualitzada:,.2f} %")
+                        # Es calcula el Sharpe a partir de la mitjana i la desviació estàndard dels rendiments   
+                        ràtio_sharpe = (rendiments_diàris.mean() - taxa_sense_risc) / rendiments_diàris.std() * (252 ** 0.5)
 
-                                        # Es mostra el valor del Sharpe obtingut
-                                        st.write(f"Sharpe: {ràtio_sharpe:,.2f}")
+                        # Es calcula la volatilitat anualitzada a partir de la desviació estàndard dels rendiments
+                        volatilitat_anualitzada = rendiments_diàris.std() * (252 ** 0.5) * 100            
 
-                                    
-                                    # S'indica que es treballa amb la segona columna   
-                                    with col2:   
+                        # RESULTATS DE LA SIMULACIÓ STOP-LOSS I TAKE-PROFIT
+                        # Es crea el botó per iniciar la simulació
+                        boto_començar= st.button(
+                            label="Començar simulació",
 
-                                        # Es mostra el benefici obtingut amb una mida destacada
-                                        st.metric(
-                                            label="Benefici:",
-                                            value= f"{benefici_inversió:,.2f} USD")
+                            # Es defineix una clau única per identificar el botó dins de Streamlit
+                            key="boto_diversificació"
+                    )
 
-                                        # Es mostra el valor final de la simulació amb una mida destacada
-                                        st.metric(
-                                            label="Valor final:",
-                                            value=f"{valor_final:,.2f} USD"
-                                        )
-                                    
-                                    # Es mostra el títol del gràfic individual de cada empresa
-                                    st.subheader("Gràfic de cada empresa")
+                        # Es comprova si s'ha premut el botó d'inici de la simulació
+                        if boto_començar==True:
+                            st.session_state.boto_començar=True
 
-                                    # GRÀFIC INDIVIDUALS DE DIVERSIFICACIÓ
-                                    # Es transforma la taula per representar l'evolució de totes les empreses en un únic gràfic
-                                    st.altair_chart(alt.Chart(taula_de_cada_empresa_individual).transform_fold(noms_empreses).mark_line().encode(
+                        # Es comprova si la simulació està activa
+                        if st.session_state.boto_començar== True:
 
-                                        # S'utilitzen les dates com a eix horitzontal
-                                        x="Dates:T",
+                                        # Es separen visualment les diferents etapes de la simulació
+                                        st.divider()
 
-                                        # S'utilitzen els valors de cada empresa com a eix vertical
-                                        y="value:Q",
+                                        # Es mostra el títol corresponent a la segona etapa
+                                        st.subheader("Etapa 2")
 
-                                        # S'utilitza el nom de l'empresa per diferenciar les diferents línies
-                                        color="key:N"
+                                        # Es mostra el títol del gràfic de l'evolució del capital total
+                                        st.subheader("Gràfic total")
 
-                                    ).properties(height=600))
+                                        # GRÀFIC DEL CAPITAL DE DIVERSIFICACIÓ
+                                        # Es crea el gràfic amb l'evolució del capital total de la cartera
+                                        st.altair_chart(alt.Chart(dades_diversificació).mark_line().encode(
 
-                                    # Es mostra el títol corresponent als detalls de cada empresa
-                                    st.subheader("Detalls de la simulació:")
+                                            # S'utilitza la data com a eix horitzontal  
+                                            x="Data:T",
 
-                                    # Es creen dues columnes per distribuir la informació
-                                    col1,espai=st.columns([1.6,3])
+                                            # S'utilitza el capital total com a eix vertical
+                                            y="Capital:Q"
+                                        ).properties(height=600))
 
-                                    # S'indica que es treballa amb la primera columna
-                                    with col1:
+                                        
+                                        
+                                        # Es mostra el subtítol corresponent als detalls de la inversió
+                                        st.subheader("Detalls de la inversió")
 
-                                        # S'estableix el contorn
-                                        with st.container(border=True):
+                                        # Es crea una estructura de columnes per distribuir els resultats
+                                        # Les columnes addicionals s'utilitzen com a espai de separació
+                                        col_resultats,col3,col4,col5 = st.columns([5,1,1,1])
 
-                                                # Es mostra el títol dels valors finals
-                                                st.markdown("##### Valor final")
+                                        # Es crea un contenidor amb una vora per agrupar els resultats
+                                        # El contenidor principal es divideix en dues columnes
+                                        with col_resultats:
+                                            with st.container(border=True):
 
-                                                # Es recorren totes les empreses per mostrar el seu valor final
-                                                for i in range(len(noms_empreses)):
+                                                # Es creen dos columnes noves
+                                                col1,col2=st.columns(2)
 
-                                                        # Es mostra el valor final corresponent a cada empresa
-                                                        st.metric(
-                                                            label=f"{noms_empreses[i]} USD",
-                                                            value= f"{valor_final_empresa[i]:,.2f} USD")
+                                        # S'indica que es treballa amb la primera columna
+                                        with col1: 
+
+                                            # Es calcula el nombre total d'accions comprades sumant les accions de totes les empreses
+                                            accions_totals_suma=sum(accions_totals_comprades)
+
+                                            # Es mostra el nombre total d'accions comprades
+                                            st.write(f"Nombre d'accions comprades: {accions_totals_suma:,.2f}")
+
+                                            # Es mostra la rendibilitat obtinguda durant la simulació
+                                            st.write(f"Rendibilitat : {rentabilitat:,.2f} %") 
+
+                                            # Es mostra el màxim Drawdown obtingut
+                                            st.write(f"Màxim Drawdown: {drawdown_màxim:,.2f} %")
+
+                                            # Es mostra la volatilitat anualitzada obtinguda
+                                            st.write(f"Volatilitat: {volatilitat_anualitzada:,.2f} %")
+
+                                            # Es mostra el valor del Sharpe obtingut
+                                            st.write(f"Sharpe: {ràtio_sharpe:,.2f}")
+
+                                        
+                                        # S'indica que es treballa amb la segona columna   
+                                        with col2:   
+
+                                            # Es mostra el benefici obtingut amb una mida destacada
+                                            st.metric(
+                                                label="Benefici:",
+                                                value= f"{benefici_inversió:,.2f} USD")
+
+                                            # Es mostra el valor final de la simulació amb una mida destacada
+                                            st.metric(
+                                                label="Valor final:",
+                                                value=f"{valor_final:,.2f} USD"
+                                            )
+                                        
+                                        # Es mostra el títol del gràfic individual de cada empresa
+                                        st.subheader("Gràfic de cada empresa")
+
+                                        # GRÀFIC INDIVIDUALS DE DIVERSIFICACIÓ
+                                        # Es transforma la taula per representar l'evolució de totes les empreses en un únic gràfic
+                                        st.altair_chart(alt.Chart(taula_de_cada_empresa_individual).transform_fold(noms_empreses).mark_line().encode(
+
+                                            # S'utilitzen les dates com a eix horitzontal
+                                            x="Dates:T",
+
+                                            # S'utilitzen els valors de cada empresa com a eix vertical
+                                            y="value:Q",
+
+                                            # S'utilitza el nom de l'empresa per diferenciar les diferents línies
+                                            color="key:N"
+
+                                        ).properties(height=600))
+
+                                        # Es mostra el títol corresponent als detalls de cada empresa
+                                        st.subheader("Detalls de la simulació:")
+
+                                        # Es creen dues columnes per distribuir la informació
+                                        col1,espai=st.columns([1.6,3])
+
+                                        # S'indica que es treballa amb la primera columna
+                                        with col1:
+
+                                            # S'estableix el contorn
+                                            with st.container(border=True):
+
+                                                    # Es mostra el títol dels valors finals
+                                                    st.markdown("##### Valor final")
+
+                                                    # Es recorren totes les empreses per mostrar el seu valor final
+                                                    for i in range(len(noms_empreses)):
+
+                                                            # Es mostra el valor final corresponent a cada empresa
+                                                            st.metric(
+                                                                label=f"{noms_empreses[i]} USD",
+                                                                value= f"{valor_final_empresa[i]:,.2f} USD")
 
 
-                                     # GUARDAR LA SIMULACIÓ DIVERSIFICACIÓ
-                                    # Es crea un botó per permetre guardar la simulació
-                                    boto_guardar_simulació= st.button("Guardar simulacio")
+                                        # GUARDAR LA SIMULACIÓ DIVERSIFICACIÓ
+                                        # Es crea un botó per permetre guardar la simulació
+                                        boto_guardar_simulació= st.button("Guardar simulacio")
 
-                                    # Es comprova si s'ha premut el botó de guardar la simulació
-                                    if boto_guardar_simulació ==True:
+                                        # Es comprova si s'ha premut el botó de guardar la simulació
+                                        if boto_guardar_simulació ==True:
 
-                                        # Es defineix una variable per indicar si la simulació ja està guardada
-                                        simulació_repetida=False
+                                            # Es defineix una variable per indicar si la simulació ja està guardada
+                                            simulació_repetida=False
 
-                                        # Es recorren totes les simulacions guardades anteriorment
-                                        for simulacions in st.session_state.simulacions_guardades:
+                                            # Es recorren totes les simulacions guardades anteriorment
+                                            for simulacions in st.session_state.simulacions_guardades:
 
-                                            # Es comprova si coincideixen l'estratègia, les empreses, el capital inicial i les dates
-                                            if (simulacions["Estratègia"]=="Diversificació" and simulacions["Empresa"]== ",".join(noms_empreses) and simulacions["Capital inicial"]==capital_inicial and simulacions["Data inici"]==data_inici_diversificació and simulacions["Data final"]==data_final_diversificació):
-                                                
-                                                # I directament es detecta que hi ha una simulació repetida
-                                                simulació_repetida=True
+                                                # Es comprova si coincideixen l'estratègia, les empreses, el capital inicial i les dates
+                                                if (simulacions["Estratègia"]=="Diversificació" and simulacions["Empresa"]== ",".join(noms_empreses) and simulacions["Capital inicial"]==capital_inicial and simulacions["Data inici"]==data_inici_diversificació and simulacions["Data final"]==data_final_diversificació):
+                                                    
+                                                    # I directament es detecta que hi ha una simulació repetida
+                                                    simulació_repetida=True
 
-                                        # Si ja existeix una simulació amb les mateixes característiques, es mostra un avís 
-                                        if simulació_repetida==True:
-                                            st.warning("No es pot repetir la mateixa simulació")
+                                            # Si ja existeix una simulació amb les mateixes característiques, es mostra un avís 
+                                            if simulació_repetida==True:
+                                                st.warning("No es pot repetir la mateixa simulació")
 
-                                        # Si no existeix cap simulació igual, es crea i es guarda la nova simulació    
-                                        else:
+                                            # Si no existeix cap simulació igual, es crea i es guarda la nova simulació    
+                                            else:
 
-                                            # Es crea un diccionari amb les dades principals de la simulació de diversificació
-                                            simulació_diversificació= {"Estratègia":"Diversificació","Empresa":",".join(noms_empreses),#join lo que hace es que el nombre de las emrpesas me las junta en solo un mismo texto TypeError: can only concatenate list (not "str") to list
-                                                    "Capital inicial":capital_inicial,"Valor final":valor_final,"Benefici":benefici_inversió,"Rendibilitat":rentabilitat,"Màxim Drawdown":drawdown_màxim,"Volatilitat":volatilitat_anualitzada,"Sharpe":ràtio_sharpe, "Evolució capital":  capital_total_invertit,"Evolució dates": dates_comunes_empreses,"Data inici":data_inici_diversificació,"Data final":data_final_diversificació}
+                                                # Es crea un diccionari amb les dades principals de la simulació de diversificació
+                                                simulació_diversificació= {"Estratègia":"Diversificació","Empresa":",".join(noms_empreses),#join lo que hace es que el nombre de las emrpesas me las junta en solo un mismo texto TypeError: can only concatenate list (not "str") to list
+                                                        "Capital inicial":capital_inicial,"Valor final":valor_final,"Benefici":benefici_inversió,"Rendibilitat":rentabilitat,"Màxim Drawdown":drawdown_màxim,"Volatilitat":volatilitat_anualitzada,"Sharpe":ràtio_sharpe, "Evolució capital":  capital_total_invertit,"Evolució dates": dates_comunes_empreses,"Data inici":data_inici_diversificació,"Data final":data_final_diversificació}
 
-                                            # S'afegeix el diccionari a la llista de simulacions guardades
-                                            st.session_state.simulacions_guardades.append(simulació_diversificació)
+                                                # S'afegeix el diccionari a la llista de simulacions guardades
+                                                st.session_state.simulacions_guardades.append(simulació_diversificació)
 
-                                            # Es mostra un missatge indicant que la simulació s'ha guardat correctament
-                                            st.write("Simulació guardada")
+                                                # Es mostra un missatge indicant que la simulació s'ha guardat correctament
+                                                st.write("Simulació guardada")
 
-                                            # Es reinicia l'aplicació per actualitzar l'estat de les simulacions guardades
-                                            st.rerun()
+                                                # Es reinicia l'aplicació per actualitzar l'estat de les simulacions guardades
+                                                st.rerun()
 
 
 

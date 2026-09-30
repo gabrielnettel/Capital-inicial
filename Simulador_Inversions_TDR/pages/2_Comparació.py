@@ -97,7 +97,7 @@ if len(st.session_state.simulacions_guardades)>1:
                               st.write("**Període:**",f"{simulació["Data inici"]}","|",f"{simulació["Data final"]}")
 
                           # S'indica que es treballa amb la quarta columna
-                          with col3: 
+                          with col4: 
 
                               # Es creen espais per distribuir visualment la informació
                               st.write(" ")
@@ -415,7 +415,6 @@ if len(st.session_state.simulacions_guardades)>1:
                )
 
 
-
           # GRÀFICS DE GUANYS
           # Es crea un divisor per separar les seccions
           st.divider()
@@ -423,18 +422,11 @@ if len(st.session_state.simulacions_guardades)>1:
           # Es mostra el títol de l'apartat de guanys
           st.subheader("GUANYS")
 
-
           # Es creen dues columnes per distribuir els gràfics dels guanys
           col1, col2 = st.columns([1, 1])
 
           # Es selecciona la primera columna
           with col1:
-
-           # Es creen deus altres columnes
-           col3,col4=st.columns([7,0.2])
-
-           # Es selecciona la tercera columna
-           with col3:
 
            # Es mostra el gràfic del valor final dins d'un contenidor amb una vora
             with st.container(border=True):
@@ -444,17 +436,11 @@ if len(st.session_state.simulacions_guardades)>1:
                     use_container_width=True
                )
 
-          # Es selecciona la quarta columna
-          with col4:
-
-           # Es creen dues altres columnes
-           col5, col6 = st.columns([7, 0.1])
-
-           # Es selecciona la cinquena columna
-           with col5:
+          # Es selecciona la segona columna
+          with col2:
             
-            # Es mostra el gràfic del benefici dins d'un contenidor amb una vora
-             with st.container(border=True):
+                # Es mostra el gràfic del benefici dins d'un contenidor amb una vora
+                with st.container(border=True):
                               st.subheader("Benefici")
                               st.altair_chart(
                                    gràfic_benefici,

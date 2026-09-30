@@ -1819,10 +1819,9 @@ if st.session_state.simulació_realitzada==True:
                     # Si existeixen dates comunes, es continua amb la simulació
                     else:
 
-                    # Es conserven únicament les dades corresponents a les dates comunes
+                    # Es conserven únicament les dades de cada empresa corresponents a les dates comunes
                         guardar_dades = [dades.loc[dates_comunes_empreses]
-
-                        # De cada dada  
+                                         
                         for dades in guardar_dades
                         # https://elpythonista.com/list-comprehensions-python
                         ]

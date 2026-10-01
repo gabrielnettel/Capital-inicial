@@ -753,10 +753,10 @@ if st.session_state.simulació_realitzada==True:
                     capital_total_invertit=capital_invertit_acumulat[-1]
 
                     # Es calcula el benefici restant el capital invertit al valor final
-                    benefici_DCA_mensual= valor_final_DCA_mensual-capital_total_invertit
+                    benefici_DCA_mensual= valor_final_DCA_mensual-capital_inicial
 
                     # Es calcula la rendibilitat de la inversió en percentatge
-                    rendibilitat_DCA_mensual= (benefici_DCA_mensual)*100/capital_total_invertit
+                    rendibilitat_DCA_mensual= (benefici_DCA_mensual)*100/capital_inicial
 
                     # Per calcular el Sharpe i la volatilitat és necessari obtenir els rendiments de la inversió.
                     # En el DCA, el capital invertit augmenta en els dies en què es realitzen aportacions.
@@ -1029,10 +1029,10 @@ if st.session_state.simulació_realitzada==True:
                      total_invertit_a=capital_invertit_acumulat[-1]
 
                      # Es calcula el benefici restant el capital invertit al valor final de la inversió
-                     benefici_DCA_anual= valor_final_DCA_a-total_invertit_a
+                     benefici_DCA_anual= valor_final_DCA_a-capital_inicial
 
                      # Es calcula la rendibilitat de la inversió en percentatge
-                     rendibilitat_DCA_anual= (benefici_DCA_anual)*100/total_invertit_a
+                     rendibilitat_DCA_anual= (benefici_DCA_anual)*100/capital_inicial
 
                      # Per calcular el Sharpe i la volatilitat és necessari obtenir els rendiments de la inversió.
                      # En el DCA, el capital invertit augmenta en els dies en què es realitzen aportacions.

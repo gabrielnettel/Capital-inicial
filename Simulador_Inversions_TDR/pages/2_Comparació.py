@@ -420,7 +420,7 @@ if len(st.session_state.simulacions_guardades)>1:
           st.divider()
 
           # Es mostra el títol de l'apartat de guanys
-          st.subheader("GUANYS")
+          st.subheader("GUANYS O PÈRDUES")
 
           # Es creen dues columnes per distribuir els gràfics dels guanys
           col1, col2 = st.columns([1, 1])

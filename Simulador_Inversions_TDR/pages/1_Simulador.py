@@ -1827,7 +1827,7 @@ if st.session_state.simulació_realitzada==True:
                         ]
 
 
-                    # A partir d'aquí continua la simulació
+
 
                         # Es combinen les empreses, el capital destinat i les seves dades mitjançant zip
                         dades_accions_empreses= zip(empreses_seleccionades,distribució_capital,guardar_dades)
@@ -1902,7 +1902,8 @@ if st.session_state.simulació_realitzada==True:
                                 
 
 
-                        # Ara que ja tinc tots els valors de cada empresa els he de sumar per a crear un únic gràfic amb tots els valors
+                        # Ara que ja es disposa de tots els valors de cada empresa
+                        # S'han de sumar per a crear un únic gràfic amb tots els valors
                         #Primer creo la llista
                         capital_total_invertit=[]
 

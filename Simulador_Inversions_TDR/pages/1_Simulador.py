@@ -756,7 +756,7 @@ if st.session_state.simulació_realitzada==True:
                     benefici_DCA_mensual= valor_final_DCA_mensual-capital_inicial
 
                     # Es calcula la rendibilitat de la inversió en percentatge
-                    rendibilitat_DCA_mensual= (benefici_DCA_mensual)*100/capital_inicial
+                    rendibilitat_DCA_mensual= (valor_final_DCA_mensual-capital_inicial)*100/capital_inicial
 
                     # Per calcular el Sharpe i la volatilitat és necessari obtenir els rendiments de la inversió.
                     # En el DCA, el capital invertit augmenta en els dies en què es realitzen aportacions.
@@ -1032,7 +1032,7 @@ if st.session_state.simulació_realitzada==True:
                      benefici_DCA_anual= valor_final_DCA_a-capital_inicial
 
                      # Es calcula la rendibilitat de la inversió en percentatge
-                     rendibilitat_DCA_anual= (benefici_DCA_anual)*100/capital_inicial
+                     rendibilitat_DCA_anual= (valor_final_DCA_a-capital_inicial)*100/capital_inicial
 
                      # Per calcular el Sharpe i la volatilitat és necessari obtenir els rendiments de la inversió.
                      # En el DCA, el capital invertit augmenta en els dies en què es realitzen aportacions.
@@ -1407,15 +1407,14 @@ if st.session_state.simulació_realitzada==True:
             # Es calcula el canvi percentual entre els valors consecutius de la  i s'elimina el primer valor
             rendiments_diàris = pd.Series(capital_stop_take_profit).pct_change().dropna()
 
-            # Es calcula la volatilitat anualitzada a partir de la desviació estàndard dels rendiments
-            volatilitat_anualitzada = rendiments_diàris.std() * (252 ** 0.5) * 100
-
             # S'estableix la taxa sense risc en 0 per al càlcul del Sharpe
             taxa_sense_risc = 0
 
             # Es calcula el Sharpe a partir de la mitjana i la desviació estàndard dels rendiment
             ràtio_sharpe = (rendiments_diàris.mean() - taxa_sense_risc) / rendiments_diàris.std() * (252 ** 0.5)
 
+            # Es calcula la volatilitat anualitzada a partir de la desviació estàndard dels rendiments
+            volatilitat_anualitzada = rendiments_diàris.std() * (252 ** 0.5) * 100
 
             # RESULTATS DE LA SIMULACIÓ STOP-LOSS I TAKE-PROFIT
             # Es mostra el subtítol corresponent als detalls de la simulació

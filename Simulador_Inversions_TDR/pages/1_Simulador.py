@@ -1580,7 +1580,7 @@ if st.session_state.simulació_realitzada==True:
             benefici_max= valor_final_ST_max-capital_inicial
 
             # Es calcula la rendibilitat de la simulació sense límits
-            rentabilitat_max= (capital_ST_max[-1]-capital_inicial)/capital_inicial*100
+            rendibilitat_max= (capital_ST_max[-1]-capital_inicial)/capital_inicial*100
 
 
             # RESULTATS DE LA SIMULACIÓ STOP-LOSS I TAKE-PROFIT SENSE LÍMITS
@@ -1621,8 +1621,8 @@ if st.session_state.simulació_realitzada==True:
                     # S'indica que es treballa en la primera columna 
                     with col1: 
 
-                        # Es representa la rentabilitat
-                        st.write(f"Rentabilitat: {rentabilitat_max:,.2f} %")
+                        # Es representa la rendibilitat
+                        st.write(f"Rendibilitat: {rendibilitat_max:,.2f} %")
 
                         
                     # S'indica que es treballa en la segona columna                        
@@ -1938,7 +1938,7 @@ if st.session_state.simulació_realitzada==True:
                         benefici_inversió= valor_final-capital_inicial
 
                         # Es calcula la rendibilitat de la inversió en percentatge
-                        rentabilitat= (valor_final-capital_inicial)/capital_inicial*100
+                        rendibilitat= (valor_final-capital_inicial)/capital_inicial*100
 
                         # Es calcula el màxim acumulat del capital total
                         màxims_acumulats=pd.Series(capital_total_invertit).cummax()
@@ -2018,7 +2018,7 @@ if st.session_state.simulació_realitzada==True:
                                         with col1: 
 
                                             # Es mostra la rendibilitat obtinguda durant la simulació
-                                            st.write(f"Rendibilitat : {rentabilitat:,.2f} %") 
+                                            st.write(f"Rendibilitat : {rendibilitat:,.2f} %") 
 
                                             # Es mostra el màxim Drawdown obtingut
                                             st.write(f"Màxim Drawdown: {drawdown_màxim:,.2f} %")
@@ -2114,7 +2114,7 @@ if st.session_state.simulació_realitzada==True:
 
                                                 # Es crea un diccionari amb les dades principals de la simulació de diversificació
                                                 simulació_diversificació= {"Estratègia":"Diversificació","Empresa":",".join(noms_empreses),#join lo que hace es que el nombre de las emrpesas me las junta en solo un mismo texto TypeError: can only concatenate list (not "str") to list
-                                                        "Capital inicial":capital_inicial,"Valor final":valor_final,"Benefici":benefici_inversió,"Rendibilitat":rentabilitat,"Màxim Drawdown":drawdown_màxim,"Volatilitat":volatilitat_anualitzada,"Sharpe":ràtio_sharpe, "Evolució capital":  capital_total_invertit,"Evolució dates": dates_comunes_empreses,"Data inici":data_inici_diversificació,"Data final":data_final_diversificació}
+                                                        "Capital inicial":capital_inicial,"Valor final":valor_final,"Benefici":benefici_inversió,"Rendibilitat":rendibilitat,"Màxim Drawdown":drawdown_màxim,"Volatilitat":volatilitat_anualitzada,"Sharpe":ràtio_sharpe, "Evolució capital":  capital_total_invertit,"Evolució dates": dates_comunes_empreses,"Data inici":data_inici_diversificació,"Data final":data_final_diversificació}
 
                                                 # S'afegeix el diccionari a la llista de simulacions guardades
                                                 st.session_state.simulacions_guardades.append(simulació_diversificació)

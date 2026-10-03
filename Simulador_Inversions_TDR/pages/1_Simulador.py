@@ -93,6 +93,9 @@ diccionari_tickers= {
 
     # Automoció
     "Volkswagen": "VWAGY","Toyota": "TM","PACCAR": "PCAR","Ford": "F","Honda": "HMC",
+
+    # Consum
+    "Wallmart": "WMT","Nestlé": "NSRGY","Coca-Cola": "KO","PepsiCo": "PEP","Procter & Gamble": "PG",
     }
 # https://www.w3schools.com/python/python_dictionaries.asp 
 
